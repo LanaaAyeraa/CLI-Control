@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLI-CONTROL — Language Discipline & Permission Center (ZIIS Putri)</title>
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Font: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --bg-inner: #F1F5F9;
+      --border-color: #CBD5E1;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+    }
+    body.theme-dark {
+      --bg-main: #070D1E;
+      --bg-card: #0E172F;
+      --bg-inner: #090E1F;
+      --border-color: #1E2C52;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .cli-card { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
+    .cli-inner { background-color: var(--bg-inner); border-color: var(--border-color); color: var(--text-main); }
+    .hero-gradient {
+      background: linear-gradient(135deg, #0284C7 0%, #2563EB 55%, #7C3AED 100%);
+    }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: var(--bg-inner); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased custom-scroll">
+
+  <!-- TOP HEADER BAR -->
+  <header class="cli-card border-b sticky top-0 z-40 shadow-xs">
+    <div class="max-w-[1600px] mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="navigate('dashboard')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-extrabold tracking-tight">CLI<span class="text-sky-500">CONTROL</span></span>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-600 dark:text-slate-400 font-medium">Language Discipline & Permission Management • ZIIS Putri</p>
+        </div>
+      </div>
+
+      <!-- Quick Global Search Bar -->
+      <div class="flex-1 max-w-xl hidden md:flex items-center relative">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5"></i>
+        <input 
+          type="text" 
+          id="global-search-header"
+          oninput="handleGlobalHeaderSearch(this.value)"
+          placeholder="Cari santriwati, anggota LCD, atau kelas..." 
+          class="w-full cli-inner text-xs rounded-xl pl-10 pr-16 py-2.5 border focus:border-sky-500 focus:outline-none transition font-medium text-slate-900 dark:text-white"
+        />
+        <span class="absolute right-3 text-[10px] cli-card border text-slate-400 px-1.5 py-0.5 rounded font-mono">Ctrl K</span>
+        <div id="header-search-results" class="hidden absolute top-12 left-0 w-full cli-card rounded-2xl shadow-2xl border p-2 max-h-64 overflow-y-auto z-50"></div>
+      </div>
+
+      <!-- Officer & Actions -->
+      <div class="flex items-center gap-3 shrink-0">
+        <button onclick="toggleThemeMode()" class="w-9 h-9 rounded-xl cli-inner border text-slate-700 dark:text-slate-300 hover:text-amber-500 flex items-center justify-center transition" title="Ganti Mode Terang / Gelap">
+          <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+        </button>
+
+        <div class="flex items-center gap-2 cli-inner border rounded-xl px-3 py-1.5">
+          <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </div>
+          <select id="global-officer-select" onchange="changeGlobalOfficer(this.value)" class="text-xs font-bold bg-transparent focus:outline-none cursor-pointer text-slate-900 dark:text-white">
+            <option value="Amirah Fauzi Badjamal">Amirah Fauzi Badjamal</option>
+            <option value="Fita Agesti Ramadhani">Fita Agesti Ramadhani</option>
+            <option value="Almira Anargya Arkan">Almira Anargya Arkan</option>
+            <option value="Amira Azalia">Amira Azalia</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Bar Menu Horizontal -->
+    <div class="cli-card border-t px-4 lg:px-8">
+      <div class="max-w-[1600px] mx-auto flex items-center gap-2 overflow-x-auto py-2 custom-scroll text-xs font-semibold">
+        <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-sky-500 bg-sky-500/15 border border-sky-500/30 transition shrink-0"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard</span></button>
+        <button onclick="navigate('input-violation')" id="nav-input-violation" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="shield-alert" class="w-4 h-4 text-emerald-500"></i><span>Input Pelanggaran (Kasir)</span></button>
+        <button onclick="navigate('permissions')" id="nav-permissions" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="file-check-2" class="w-4 h-4 text-indigo-500"></i><span>Perizinan Bahasa</span></button>
+        <button onclick="navigate('collaboration')" id="nav-collaboration" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="mail" class="w-4 h-4 text-blue-500"></i><span>Surat & Kolaborasi</span></button>
+        <button onclick="navigate('violations')" id="nav-violations" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i><span>Data Pelanggaran & Sanksi</span></button>
+        <button onclick="navigate('students')" id="nav-students" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="users" class="w-4 h-4 text-cyan-500"></i><span>Data Santriwati & Tim LCD</span></button>
+        <button onclick="navigate('reports')" id="nav-reports" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i><span>Rekap & LPJ</span></button>
+        <button onclick="navigate('backup')" id="nav-backup" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="database" class="w-4 h-4 text-orange-500"></i><span>Migrasi Data</span></button>
+        <button onclick="navigate('categories')" id="nav-categories" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-sky-500 transition shrink-0"><i data-lucide="settings-2" class="w-4 h-4 text-slate-500"></i><span>SOP & Kategori Aturan</span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6 space-y-6">
+    <div id="app-container"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="cli-card border-t py-4 text-center text-xs text-slate-600 dark:text-slate-400 font-semibold">
+    <p>“Speaking Good Language, Building Bright Future.” • Bagian Bahasa (CLI) Pondok Pesantren Modern ZIIS Cilongok</p>
+  </footer>
+
+  <!-- MODAL CONTAINER -->
+  <div id="modal-container" class="relative z-50"></div>
+
+  <!-- SCRIPT LOGIC & EMBEDDED DATA -->
+  <script>
+    const CLI_OFFICERS = [
+      "Amirah Fauzi Badjamal",
+      "Fita Agesti Ramadhani",
+      "Almira Anargya Arkan",
+      "Amira Azalia"
+    ];
+
+    const COLLABORATION_DIVISIONS = [
+      "KETUA",
+      "SEKERTARIS BENDAHARA",
+      "TA'MIR MASJID",
+      "KEAMANAN",
+      "KOORDINATOR PRAMUKA",
+      "KEBERSIHAN",
+      "BAG. OLAHRAGA",
+      "BAG. DAPUR",
+      "BAG. PENERIMAAN PAKET"
+    ];
+
+    const DEFAULT_CATEGORIES = [
+      { category_id: "CAT-AKU", category_name: "Penggunaan Aku - Kamu", default_level: "RINGAN" },
+      { category_id: "CAT-TLT", category_name: "Terlambat ke Kelas Tanpa Alasan", default_level: "RINGAN" },
+      { category_id: "CAT-DAE", category_name: "Bahasa Daerah (Jawa/Sunda)", default_level: "SEDANG" },
+      { category_id: "CAT-ALP", category_name: "Alpa Sesi Bahasa (1-2x)", default_level: "SEDANG" },
+      { category_id: "CAT-KAS", category_name: "Bahasa Kasar / Kotor", default_level: "BERAT" },
+      { category_id: "CAT-AL3", category_name: "Alpa 3x atau Lebih", default_level: "BERAT" }
+    ];
+
+    const ORGANIZATION_QUOTES = [
+      "“Organisasi bukan tentang siapa yang paling pintar bicara, tapi siapa yang paling ikhlas berkorban dan konsisten bertindak.”",
+      "“Kebersamaan dalam tim adalah kekuatan. Bekerjalah dengan hati, tegakkan disiplin bahasa dengan keteladanan.”",
+      "“Satu kata bahasa asing yang dibiasakan hari ini adalah ribuan pintu masa depan yang terbuka esok hari.”",
+      "“Amanah kepengurusan tidak pernah salah memilih pundak. Tetap kompak, sabar, dan bersemangat, CLI Kece!”",
+      "“Menegakkan aturan bukan untuk menghukum, tapi untuk membentuk karakter kemandirian dan martabat santriwati.”"
+    ];
+
+    const RAW_PACKED_STUDENTS = `STR-001|Abiyya Niba Prabowo|7G|0
+STR-002|Alani Fatini|7G|0
+STR-003|Alisha Khairina Sukma|7G|0
+STR-004|Allicia Zahwa Almahira Zamzami|7G|0
+STR-005|Amoura Halimatunisa Tharikh Putusena|7G|0
+STR-006|Anindita Keisha Zahra|7G|0
+STR-007|Aqila Lu'luatunafi|7G|0
+STR-008|Arumi Artsa Syauqia|7G|0
+STR-009|Asyabyia Zalfa Alya|7G|0
+STR-010|Atiqoh Rihadatul Aisyah|7G|0
+STR-011|Ayda Felisha|7G|0
+STR-012|Batrisya Faida Nuriy|7G|0
+STR-013|Bunga Kinanti|7G|0
+STR-014|Cindar Agustin|7G|0
+STR-015|Delisha Ammara Salsabila|7G|0
+STR-016|Ghavea Azra Wardana|7G|0
+STR-017|Hania Syakira|7G|0
+STR-018|Hasna Alfia Zahra|7G|0
+STR-019|Hasna Nur Aulia|7G|0
+STR-020|Khairunnisa Arika Fatin|7G|0
+STR-021|Khasna Fazila Rahma|7G|0
+STR-022|Khayla Farzana Maritzabel|7G|0
+STR-023|Kireina Fuyuyuki Al Thafunnisa|7G|0
+STR-024|Kyna Lufi|7G|0
+STR-025|Nafisha Dwi Wahyu Setyo Putri|7G|0
+STR-026|Najwa Humairah|7G|0
+STR-027|Naufalyn Fikria Khanza Rafani|7G|0
+STR-028|Oryza Sativa Az Zahro|7G|0
+STR-029|Raisya Radya Paramitha|7G|0
+STR-030|Risti Alisha Santoso|7G|0
+STR-031|Salsabila Ayu Hanifa|7G|0
+STR-032|Shanum Vanesha Ufaira|7G|0
+STR-033|Syafira Hazna Agnita|7G|0
+STR-034|Syarifah Ta'hannunika|7G|0
+STR-035|Aisha Wahyu Al-Husna|7H|0
+STR-036|Aisyah Nailah Askhana Sakhi|7H|0
+STR-037|Aisyatuzzahro Rosyida|7H|0
+STR-038|Al Khansa Syafiqa Nugraha|7H|0
+STR-039|Alifah Zahrotul Ummama|7H|0
+STR-040|Anindita Bestari Putri|7H|0
+STR-041|Anindita Destrian|7H|0
+STR-042|Aretha Zhafira Aznii|7H|0
+STR-043|Atiqah Wahyu Fathinah|7H|0
+STR-044|Auva Zidni Diyaul Musyafa|7H|0
+STR-045|Avida Kayla Almahyra|7H|0
+STR-046|Ayesha Al Mubarokah|7H|0
+STR-047|Chalista Aulia Belva|7H|0
+STR-048|Cut Syakila Kirana Mahdiana|7H|0
+STR-049|Decalista Faeza Kinanthi|7H|0
+STR-050|Dhanisa Humaira Melodi Andono|7H|0
+STR-051|Dzakira Azka Nur 'Afifah|7H|0
+STR-052|Fidea Aqeela|7H|0
+STR-053|Hafiza Khaira|7H|0
+STR-054|Hafiza Khaira Assyabiya|7H|0
+STR-055|Hanifah Rafa|7H|0
+STR-056|Hidayu Putri Satunggal|7H|0
+STR-057|Jiyah Najwah Syaikhoh|7H|0
+STR-058|Kanaya Lashira Gefanda|7H|0
+STR-059|Khanza Lukita Zahra|7H|0
+STR-060|Lily Ferlin|7H|0
+STR-061|Maulidya Nafishatusalwa|7H|0
+STR-062|Naila Zafira|7H|0
+STR-063|Nataya Apta Zada Qamarina|7H|0
+STR-064|Nimas Arisa Pitaloka|7H|0
+STR-065|Nur Aina Rahma Wahyudi|7H|0
+STR-066|Rizsyana Athalya Muffie|7H|0
+STR-067|Siti Adiba|7H|0
+STR-068|Syifa Sauqiya|7H|0
+STR-069|Aisha Rabbani|7I|0
+STR-070|Aisya Dwi Daenah|7I|0
+STR-071|Aisyah Alifatul Khoswah|7I|0
+STR-072|Aisyah My Yuzan|7I|0
+STR-073|Alexandra Felice Belinda|7I|0
+STR-074|Almira Syakira Wijaya|7I|0
+STR-075|Aquina Fatharani Budiono|7I|0
+STR-076|Assyabiya Zalfa Alya|7I|0
+STR-077|Azaliia Quinnova Zaheera|7I|0
+STR-078|Belqis Nadira Thafana|7I|0
+STR-079|Dzakira Talita Khaira|7I|0
+STR-080|Faizah Amelia Ramadhani|7I|0
+STR-081|Geassa Nurchello Bastari|7I|0
+STR-082|Husna Annisa Zahra|7I|0
+STR-083|Izzatul Millah|7I|0
+STR-084|Kanaya Ayunindya Fitrianto|7I|0
+STR-085|Khalisya Sharlin Nugroho|7I|0
+STR-086|Khanza Ainun Latifah|7I|0
+STR-087|Kiandra Sakhi Inara|7I|0
+STR-088|Laiqa Nasheeta|7I|0
+STR-089|Luhfarhunnisa Sabrikinasih|7I|0
+STR-090|Mikhayla Putri Lestanto|7I|0
+STR-091|Nacita Otti Akila Supra|7I|0
+STR-092|Naufa Dzakiyyah Dzawwad|7I|0
+STR-093|Nayghita Okta Natzilla|7I|0
+STR-094|Prinsa Amalia|7I|0
+STR-095|Qonita Mahira Felcia Yamma|7I|0
+STR-096|Quintarry Sekar Widyasmara|7I|0
+STR-097|Raisya Aulia Zahra|7I|0
+STR-098|Samantha Gusti Sutriani|7I|0
+STR-099|Syifana Nurmaulida|7I|0
+STR-100|Yumna Tsuraya Izzatunnisa|7I|0
+STR-101|Zara Qaireen Shakeela|7I|0
+STR-102|Zhafira Haniyya Bahar|7I|0
+STR-103|Adzkiya Hafizhatun Nisa|7J|0
+STR-104|Ainun Mahya|7J|0
+STR-105|Aisha Aqeela Aliana|7J|0
+STR-106|Aisyah Khairunnisa Muflihah|7J|0
+STR-107|Alifatul Lutfi Janitra|7J|0
+STR-108|Alzena Shava Aqeela|7J|0
+STR-109|Anisa Elshanum Guntoro|7J|0
+STR-110|Azkiya Aprilia Putri|7J|0
+STR-111|Bilqis Fatin Fadillah|7J|0
+STR-112|El hazima Aquina Samudra|7J|0
+STR-113|Fahira Adni Abida|7J|0
+STR-114|Hafiza Khaira Zulfa|7J|0
+STR-115|Hanifah Maulina|7J|0
+STR-116|Hanna Maryam Saputri|7J|0
+STR-117|Hanna Yasmira Agni|7J|0
+STR-118|Hilya Nafisa|7J|0
+STR-119|Maulida Rahmah Sujono|7J|0
+STR-120|Nabila Aulia Rahma|7J|0
+STR-121|Nabila Az-Zahra Ramadhani|7J|0
+STR-122|Nafisah Wahyu Muharromi|7J|0
+STR-123|Nasywa Kamila Fawwaz|7J|0
+STR-124|Pramita Nisaka Aqila Hadi|7J|0
+STR-125|Raisya Ahzasyakira Amru|7J|0
+STR-126|Shakila Ghina Aftani|7J|0
+STR-127|Zaahirah Setiya Firdausi|7J|0
+STR-128|Zivana Azka Shakila|7J|0
+STR-129|Aisyah Fibi Aqilah|8F|0
+STR-130|Alega Widi Ramadhani|8F|0
+STR-131|Alifah Naufalyn Rabbani|8F|0
+STR-132|Amalia Khansa Salsabila|8F|0
+STR-133|Aqila Putri Abhista|8F|1
+STR-134|Benita Lisanda|8F|0
+STR-135|Bilqis Nafisa Batari|8F|0
+STR-136|Bulan Khansa Janitra|8F|0
+STR-137|Calistha Clara Ratnaduhita|8F|0
+STR-138|Cayla Carana Candrarupa|8F|0
+STR-139|Eirsa Putri Arrohim|8F|0
+STR-140|Faranisa Affiyah|8F|0
+STR-141|Galung Atha Zainiya|8F|0
+STR-142|Heksa Dayana Putri Dhaneswari|8F|0
+STR-143|Izzatunisa Aulia Firda|8F|0
+STR-144|Khaira Labiba Arrazi|8F|0
+STR-145|Muftia Naura Afrianti|8F|0
+STR-146|Nada Aliyah Adriana|8F|0
+STR-147|Naynda Fatihatus Sa'adah|8F|0
+STR-148|Sabbihisma Saida Safanya|8F|0
+STR-149|Shakila Luthfi Husna Adzaka|8F|0
+STR-150|Shakira Alesha Iha|8F|0
+STR-151|Shanaya Alyazia Lathifah Raharjo|8F|0
+STR-152|Sufi Lathifatun Pribadi|8F|0
+STR-153|Umaira Azzahra Pranyoto|8F|0
+STR-154|Vania Artanti|8F|0
+STR-155|Yasmin Filzah Syaefudin|8F|0
+STR-156|Zaahirah Nur Hafshah|8F|0
+STR-157|Zada Nur Lalita|8F|0
+STR-158|Adela Esya Luziana|8G|0
+STR-159|Adelia Keysha Sato|8G|0
+STR-160|Aisyah Huriah Lawahizh|8G|0
+STR-161|Akifa Naila Muazara|8G|0
+STR-162|Alea Shaquilla Wijaya|8G|0
+STR-163|Alisha Fazila Utami|8G|0
+STR-164|Anjellita Ghinaa Qonitah|8G|0
+STR-165|Aqila Nafisyahirah Yunanto|8G|0
+STR-166|Belvana Alesha Rhamadani|8G|0
+STR-167|Bintaya Shaquilla Aeghisa Elfaozi|8G|0
+STR-168|Deandra Keenan Tsuroyya|8G|0
+STR-169|Dini Yanzee|8G|0
+STR-170|Early Zitna Mufida|8G|1
+STR-171|Faeyza Arsyila Auf|8G|0
+STR-172|Firyal Malaeka Hayfa Alnada|8G|0
+STR-173|Ghassani Qisthi Huri|8G|0
+STR-174|Jihan Rahmawati Hidayat|8G|0
+STR-175|Juwita Resanty|8G|0
+STR-176|Lulu Afifah Humairah|8G|0
+STR-177|Nabiilah Aisyah Shafira|8G|0
+STR-178|Naila Muazara Ulfa|8G|0
+STR-179|Novita Ceryna Wibowo|8G|0
+STR-180|Nurraya Sakhi Mangkogitha|8G|0
+STR-181|Rosana Syahron|8G|0
+STR-182|Saola Alzena Maritza|8G|0
+STR-183|Shaqeela Aluna Firza Jayeng Rana|8G|0
+STR-184|Syakira Karamina Putri Nugraha|8G|0
+STR-185|Valena Alya Putri|8G|0
+STR-186|Zaina Nuril Qolbi|8G|0
+STR-187|Adelina Aretha Budiyono|8H|0
+STR-188|Afika Aprilia Azka|8H|0
+STR-189|Alisa Artanti|8H|0
+STR-190|Almaira Ramadhani Amani Sihasst|8H|0
+STR-191|Aura Dewi Kusuma Ningrum|8H|0
+STR-192|Aura Lara Pratama|8H|0
+STR-193|Azmi Wafiy Mustikasari|8H|0
+STR-194|Delisa Audria Nasywa|8H|0
+STR-195|Elsant Jauzaa Hana Anjani|8H|0
+STR-196|Fazila Khansa Nayla Maritza|8H|0
+STR-197|Gita Puspita Arum|8H|0
+STR-198|Halimah Althafunnisa Widodo|8H|0
+STR-199|Kareen Zahra Maulani|8H|0
+STR-200|Khansa Syauqia Husna Ramadhani|8H|0
+STR-201|Labibah Syifa Aulia|8H|0
+STR-202|Leiyen Wahyoe Agistin|8H|0
+STR-203|Madyna Alinka Prabhandari|8H|0
+STR-204|Marisa Aghni Syakira|8H|0
+STR-205|Mutiara Mei Queen Mumtazah|8H|0
+STR-206|Nafiza Azzalya Rahma|8H|0
+STR-207|Naila Muazara|8H|0
+STR-208|Naura Aisyah Thafana Rahma|8H|0
+STR-209|Nazila Avara Al Kautsar|8H|0
+STR-210|Putri Kirana|8H|0
+STR-211|Raissa Nur Setya Putri|8H|0
+STR-212|Rayhana Taqiya Najwa|8H|0
+STR-213|Rayyaa Rizqita Ellishaque|8H|0
+STR-214|Wirda Devina Ayudya|8H|0
+STR-215|Aisha Fathiya Zahra|8I|0
+STR-216|Alisha Umar Aghny|8I|0
+STR-217|Athifa Lentera Jinan|8I|0
+STR-218|Azizah Sukmaning Putri|8I|0
+STR-219|Azkadina Mahira Taqiya Rahma|8I|0
+STR-220|Chika Putri Permana|8I|0
+STR-221|Dhealisa Faihilmi Pramudita|8I|0
+STR-222|Hasna Maulidya|8I|0
+STR-223|Ibnati Hafeeza Qanita|8I|1
+STR-224|Ismi Nur Rahmah|8I|0
+STR-225|Kamilia Nahda Syafiqa|8I|0
+STR-226|Mazia Aqila Qanita|8I|0
+STR-227|Nuria Alisha Ramadhani|8I|0
+STR-228|Safa Harum Pradita|8I|0
+STR-229|Seysa Chalystha Puteri|8I|0
+STR-230|Shaqilla Hanania Harisko|8I|0
+STR-231|Sumayyah|8I|0
+STR-232|Zaskia Liyana Zahira Anavi|8I|0
+STR-233|Zhafira Shakila Kalyn|8I|0
+STR-234|Adindha Fildzah Shaqilla Putry|9F|0
+STR-235|Alian Rakha Jinan|9F|0
+STR-236|Alifa Zahra Syawalexy|9F|0
+STR-237|Alisya Bilqist De Souza|9F|0
+STR-238|Almira Deshi Aisha Putri|9F|1
+STR-239|Aqila Adlinnisa|9F|0
+STR-240|Ariane Shaquilla Munaf|9F|0
+STR-241|Azkiya Fitri Althafunnisa|9F|0
+STR-242|Bintang Anindya|9F|0
+STR-243|Danisha Sani Faizah|9F|1
+STR-244|Fadila Tsabita Aliya Hafizh|9F|0
+STR-245|Fairuz Yanuar Rizky|9F|0
+STR-246|Felisya Allura Sabriya|9F|0
+STR-247|Ghaida Arrumaisha Anwar|9F|0
+STR-248|Hasna Endien Nailal Fahmi|9F|0
+STR-249|Hening Ara Zulfarijkia|9F|0
+STR-250|Kamillia Kamil|9F|1
+STR-251|Khanza Aileen Evelyna|9F|0
+STR-252|Maida Nurul Waasiu Hikmah|9F|0
+STR-253|Medira Kanaya Zulfa|9F|0
+STR-254|Mekar Fitriyani Dwi Atmimi|9F|0
+STR-255|Mutiara Gurotha Azzura|9F|0
+STR-256|Nararya Khaira Wilda|9F|0
+STR-257|Nazifa Adenta Latif|9F|0
+STR-258|Noeraini Ramdhanova Isnani|9F|0
+STR-259|Rayana Nasywa Nataswara|9F|0
+STR-260|Shafa Hanin Nur Azizah|9F|0
+STR-261|Taqiyya Amena Putri Musthofa|9F|0
+STR-262|Zaskya Asyifa Putri Adiyanto|9F|0
+STR-263|Akiela Chika Zafira|9G|0
+STR-264|Aliya Qurrota 'aini|9G|0
+STR-265|Alya Syakira|9G|0
+STR-266|Amabel Damara Elysia|9G|0
+STR-267|Azkiatunnida|9G|0
+STR-268|Bilqis Nuri Fadilah|9G|0
+STR-269|Bulan Adellina|9G|0
+STR-270|Dzakira Ath Thahira Zahra|9G|0
+STR-271|Eugenia Izzati Tirtantana|9G|0
+STR-272|Faras Lintang Laksita|9G|0
+STR-273|Gendhis Alifah Putri Harjita|9G|0
+STR-274|Hanun Zhafira|9G|0
+STR-275|Kairunnisa Al Ginan|9G|0
+STR-276|Khansa Aqilla Ghaniyah|9G|0
+STR-277|Kinanti Arofah Fahlev|9G|0
+STR-278|Kinar Khanza Haniyah|9G|0
+STR-279|Krisna Chantika Khoirina|9G|0
+STR-280|Lathifah Alenna Rizqy|9G|0
+STR-281|Mikhayla Zerlina Sharleen|9G|0
+STR-282|Nabila Jesslyn|9G|0
+STR-283|Nayla Zahwa 'Ilmii Syarofa|9G|0
+STR-284|Sabrina Soumi Sifa|9G|0
+STR-285|Sarah Tanlita Zahra|9G|0
+STR-286|Selena Avara Hannah|9G|0
+STR-287|Selena Zahra Fadiya|9G|0
+STR-288|Shakira Kamal Azkia Suprayogi|9G|0
+STR-289|Sharefa Jihan Amira|9G|0
+STR-290|Syafiqa Nabila Saptonissa|9G|0
+STR-291|Syifa'ul Qolby Putikasari|9G|0
+STR-292|Akina Marsya Nalini|9H|0
+STR-293|Alviolina Syahda Putri|9H|0
+STR-294|Annisa Shakaila Nandini Wibowo|9H|0
+STR-295|Aqilla Ramadhani Ridlo|9H|0
+STR-296|Asysifa Marchaa Charisun|9H|0
+STR-297|Auryn Humaira Antona|9H|0
+STR-298|Azalea Humaira Rakhmadhani|9H|0
+STR-299|Balqis Nur Hanifah|9H|0
+STR-300|Dara Ayu Aulia Ramadhani|9H|0
+STR-301|Deandra Alisha Putri|9H|0
+STR-302|Dzakira Nur Asyfa|9H|0
+STR-303|Filia Luthfi Syafana|9H|0
+STR-304|Hanin Al Syakira Abdullah|9H|0
+STR-305|Hasna Andriana Aletha Dzakwan|9H|0
+STR-306|Khansa Alfath Huwaida|9H|0
+STR-307|Mounia Aqilla|9H|0
+STR-308|Mulia Zahratun Nisa|9H|0
+STR-309|Nadia Alyssa Raharjo|9H|0
+STR-310|Najmi Haifa Mashudi|9H|1
+STR-311|Naylin Nur Faizah|9H|0
+STR-312|Puspo Wasesa Ratuningtyas|9H|0
+STR-313|Queen Kamil Jasmine|9H|0
+STR-314|Sabrina Affia Zahra|9H|0
+STR-315|Saffa Khosyya Insanillah|9H|0
+STR-316|Sami Khansa Sabila|9H|0
+STR-317|Syaira Dilaida Kirei Qiena|9H|0
+STR-318|Talita Dzuhasna Labiba|9H|0
+STR-319|Vania Kamilah Rosyadatullah|9H|0
+STR-320|Syaura Sabiya|9H|0
+STR-321|Abytha Mohana Ilyas|9I|1
+STR-322|Alesha Mufida|9I|0
+STR-323|Arsyfa Salsabila Suciptadi|9I|0
+STR-324|Barokatuzzidni|9I|0
+STR-325|Binar Rana Shafeeya|9I|0
+STR-326|Citra Anindya Khalfani|9I|0
+STR-327|Dzihni Bintani Kamania|9I|0
+STR-328|Fazila Arfah|9I|0
+STR-329|Ghaida Salsabila Zahri|9I|0
+STR-330|Hafiza Farhana|9I|0
+STR-331|Jinan Aabidah Tazkia Berlian Malahati|9I|0
+STR-332|Khansa Bakhita Mahya|9I|0
+STR-333|Naila Nuraini|9I|0
+STR-334|Qonita Valeriana Agatha|9I|0
+STR-335|Rania Aqila Dannis Baryza|9I|0
+STR-336|Shazia Kayyisa Ramadhani|9I|0
+STR-337|Adinda Putri Salsabila|10C|0
+STR-338|Aliza Nur Zivara Syifa|10C|0
+STR-339|Asma Amany Syahidah|10C|0
+STR-340|Bilqis Surayya Tuffahati|10C|0
+STR-341|Fatiyya Abida|10C|0
+STR-342|Gania Fahma Dayyana|10C|0
+STR-343|Ghefira Athaya Putri Perwiratama|10C|0
+STR-344|Hanifah Aulia Zulfa|10C|0
+STR-345|Helga Maheswari|10C|0
+STR-346|Hilma Shafwatun Nada|10C|0
+STR-347|Hira Syifa Alhusna|10C|0
+STR-348|Kaila Maheswari|10C|0
+STR-349|Khairani Nurrahmah|10C|0
+STR-350|Mayra Alfia Nur Khasanah|10C|0
+STR-351|Muzzah Awwaliya Putri Hidayat|10C|0
+STR-352|Nahla Putri Ali|10C|0
+STR-353|Naifa Azkashakila Amru|10C|0
+STR-354|Naura Alya Sabrina|10C|0
+STR-355|Nirbita Galih Anggraini Amezqua|10C|0
+STR-356|Raihanah Afra|10C|0
+STR-357|Sahla Khoirunnisa|10C|0
+STR-358|Salsabila Almira Khumaedi|10C|0
+STR-359|Ulya Fauziatunnisa|10C|0
+STR-360|Zalfa Azmi Athifah|10C|0
+STR-361|Aini Maula Rachmah|10D|0
+STR-362|Amanda Purwaningtyas|10D|0
+STR-363|Andara Nada Zalfa|10D|0
+STR-364|Asyila Yumna Rofidoh|10D|0
+STR-365|Ayumi Uzlifatil Jannah|10D|0
+STR-366|Fatihatun Nisa|10D|0
+STR-367|Haifa Afanin Nuurusyita|10D|0
+STR-368|Hana Hayatul Husna|10D|0
+STR-369|Keibita Kusumadewi Kuntoro|10D|0
+STR-370|Kusuma Lintang Caturratri|10D|0
+STR-371|Meyisca Lenita Rhea Rewinda|10D|0
+STR-372|Miftahul Nailah|10D|0
+STR-373|Nabila Azkiya|10D|0
+STR-374|Qotrunnada Ghaziyah Al Husna|10D|0
+STR-375|Rahma Aulia|10D|0
+STR-376|Refi Okta Mahmadah|10D|0
+STR-377|Sarah Salifah Khaira|10D|0
+STR-378|Siti Zahra Meilani Putri|10D|0
+STR-379|Syefana Maisa Fazila|10D|0
+STR-380|Talita Azka Fakhrunnisa|10D|0
+STR-381|Tsaniya Talitha Athaya|10D|0
+STR-382|Zafarani Khasna Nasrulloh|10D|0
+STR-383|Zirlyvera Raisyafika|10D|0
+STR-384|Ahna Fauziyyah Ilmi|11D|0
+STR-385|Aldila Cahya Humaira|11D|0
+STR-386|Alya Qurrota Aini|11D|0
+STR-387|Anida Noriza Zuhayra|11D|0
+STR-388|Annisa Rahma Dzakia|11D|0
+STR-389|Assyifa Emma Widjayanti|11D|0
+STR-390|Ataka Zulia Yasmin|11D|0
+STR-391|Ayudia Virna Listi|11D|0
+STR-392|Callysta Khairunnisaputri|11D|0
+STR-393|Fadhila Sholiha|11D|0
+STR-394|Fadinda Miftahul Nisa|11D|0
+STR-395|Felisha Gayuh Pangesti|11D|0
+STR-396|Felisya Naura Ardlynea Caesar|11D|0
+STR-397|Fenti Listiyani|11D|0
+STR-398|Fe'villa Rose Mutiara Samudra|11D|0
+STR-399|Hasna Nur Arifah|11D|0
+STR-400|Ivana Kairani Athabryna|11D|0
+STR-401|Khalisha Balqis Iftinan|11D|0
+STR-402|Larasati Purwadinata|11D|0
+STR-403|Lisa Husna Fadillah|11D|0
+STR-404|Maghna Syanaiscara Nove Abidin|11D|0
+STR-405|Mulia Lida Apsarini|11D|0
+STR-406|Nadhifa Derish Az-Zalfaa|11D|0
+STR-407|Nadiatu Halila|11D|0
+STR-408|Putri Artanti Ayuningtyas|11D|0
+STR-409|Queen Kireina Sekar Wangi|11D|0
+STR-410|Sekarjati Purna Widya Asmara|11D|0
+STR-411|Shaqina Azalea Putri Asmara|11D|0
+STR-412|Shaula Syifa Imania|11D|0
+STR-413|Syafiqoh Zahrotul Jannah|11D|0
+STR-414|Tsania Rizqina Ramadhani|11D|0
+STR-415|Verda Olivia Zivana|11D|0
+STR-416|Wafa Janati|11D|0
+STR-417|Zidna Assyarah|11D|0
+STR-418|Adzkia Rafif Almeera|11E|0
+STR-419|Aida Anindya Ilyas|11E|0
+STR-420|Alya Ramadhani|11E|0
+STR-421|Aurelia Winner Haq|11E|0
+STR-422|Azellia Mayesa Putri Fahrudin|11E|0
+STR-423|Farsya Aira Lubnaya|11E|0
+STR-424|Fitria Ramadhani|11E|0
+STR-425|Hilmiya Zara Hamidah|11E|0
+STR-426|Jaaneta Nur Bakhitah|11E|0
+STR-427|Khaerunnissa Fauziyah Eka Persada|11E|0
+STR-428|Latiefa Syamsi Azzahra|11E|0
+STR-429|Nabiilah Dwi Maytasari|11E|0
+STR-430|Nazilfa Rizqia Akhsani|11E|0
+STR-431|Novita Fadilah Sari|11E|0
+STR-432|Prittya Salsabila|11E|0
+STR-433|Sabrina Sahda Wayan Fauziyah|11E|0
+STR-434|Saputri|11E|0
+STR-435|Syafa Salsabila|11E|0
+STR-436|Syifa|11E|0
+STR-437|Voletta Yoshe Vania|11E|0
+STR-438|Zahra Aulia Fitri|11E|0
+STR-439|Zahraa Amalia Putri|11E|0
+STR-440|Adela Dhia Khairunnisa|12E|0
+STR-441|Aisyah Girindra Mutia Hakim|12E|0
+STR-442|Amira Azalia|12E|0
+STR-443|Andina Aura Gendis Maharani|12E|0
+STR-444|Anggita Hilmi Sabila|12E|0
+STR-445|Aqeela Althaafa Maisha|12E|0
+STR-446|Areta Azalia Nurokalina|12E|0
+STR-447|Aufa Salsabila|12E|0
+STR-448|Aurelia Raisa Azarin|12E|0
+STR-449|Fita Agesti Ramadhani|12E|0
+STR-450|Frenisya Cahya Faradhisa|12E|0
+STR-451|Gendis Bulan Pramesti|12E|0
+STR-452|Kania Keyla Sumarlin|12E|0
+STR-453|Krisna Ayu Khoirunnisa|12E|0
+STR-454|Nabila Atikah Purnama|12E|0
+STR-455|Nabila Salma Ardia|12E|0
+STR-456|Nabila Yusrina Syifa'a|12E|0
+STR-457|Nahdiyatul Ilmiyah|12E|0
+STR-458|Naomi Adinda Nayla Trisula|12E|0
+STR-459|Nayla Khanza Azzahra|12E|0
+STR-460|Nazila Almaira Putri Santosa|12E|0
+STR-461|Putri Nur Sakinah|12E|0
+STR-462|Qaf Kyla Maheswari Herlangga|12E|0
+STR-463|Salma Arum Artanti|12E|0
+STR-464|Aisha Fi'il Fahmi Dzakirah|12F|0
+STR-465|Alifah Nurul Izzah|12F|0
+STR-466|Almira Anargya Arkan|12F|0
+STR-467|Amira Nur Azkia|12F|0
+STR-468|Aurellia Alifia Shifa|12F|0
+STR-469|Dhiya Syafa Salsabilla|12F|0
+STR-470|Dzakiyyah Nur Arifa|12F|0
+STR-471|Elma Mazayya Putri|12F|0
+STR-472|Hadyan Rafeyfa Asyla|12F|0
+STR-473|Halida Fata Alifa|12F|0
+STR-474|Hamazah Rosyidah Rahajeng|12F|0
+STR-475|Khansa Ameylia Devy|12F|0
+STR-476|Khansa Aqila Al Atsira|12F|0
+STR-477|Khiara Raya Almaghfirah|12F|0
+STR-478|Moza Aldira Ramadhani|12F|0
+STR-479|Nadhifa Muntanazzihan|12F|0
+STR-480|Najla Adiba Fatih|12F|0
+STR-481|Putri Maharani Az-Zahra|12F|0
+STR-482|Raihanun Syafina Rahmi|12F|0
+STR-483|Riska Noventy Az-Zahra|12F|0
+STR-484|Syaffia Nabila Hasna|12F|0
+STR-485|Amabella Thrisna Firsty|12G|0
+STR-486|Amirah Fauzi Badjamal|12G|0
+STR-487|Argya Maheswari|12G|0
+STR-488|Cyrila Bibel Qurratu'ain|12G|0
+STR-489|Dwi Anindi Kartika Kumala Dewi|12G|0
+STR-490|Ganis Septiasa|12G|0
+STR-491|Ghumaisa Khairani Sena|12G|0
+STR-492|Jauza Nida Syafaqoh|12G|0
+STR-493|Marsya Aulia|12G|0
+STR-494|Talitha Zuleika|12G|0
+STR-495|Yumna Khaira|12G|0`;
+
+    function unpackStudents(raw) {
+      return raw.trim().split("\n").map(line => {
+        const p = line.split("|");
+        return {
+          id: p[0],
+          name: p[1],
+          class: p[2],
+          is_lcd: p[3] === "1"
+        };
+      });
+    }
+
+    const Storage = {
+      get(key, fallback) {
+        try {
+          const item = localStorage.getItem('CLI_SAFE_FINAL_' + key);
+          return item ? JSON.parse(item) : fallback;
+        } catch { return fallback; }
+      },
+      set(key, val) {
+        try {
+          localStorage.setItem('CLI_SAFE_FINAL_' + key, JSON.stringify(val));
+        } catch (e) { console.error("Storage Error", e); }
+      }
+    };
+
+    let currentGlobalOfficer = Storage.get('ACTIVE_OFFICER', CLI_OFFICERS[1]);
+    let currentThemeMode = Storage.get('THEME_MODE', 'light');
+
+    const DEFAULT_GROQ_KEY = "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";
+
+    let DB = {
+      groqApiKey: Storage.get('GROQ_KEY', DEFAULT_GROQ_KEY),
+      students: Storage.get('STUDENTS', unpackStudents(RAW_PACKED_STUDENTS)),
+      categories: Storage.get('CATEGORIES', DEFAULT_CATEGORIES),
+      violations: Storage.get('VIOLATIONS', []),
+      permissions: Storage.get('PERMISSIONS', []),
+      letters: Storage.get('LETTERS', [])
+    };
+
+    if (!DB.groqApiKey) {
+      DB.groqApiKey = DEFAULT_GROQ_KEY;
+      Storage.set('GROQ_KEY', DEFAULT_GROQ_KEY);
+    }
+
+    function saveDB() {
+      Storage.set('STUDENTS', DB.students);
+      Storage.set('CATEGORIES', DB.categories);
+      Storage.set('VIOLATIONS', DB.violations);
+      Storage.set('PERMISSIONS', DB.permissions);
+      Storage.set('LETTERS', DB.letters);
+    }
+
+    function initTopBarOfficer() {
+      const sel = document.getElementById('global-officer-select');
+      if (!sel) return;
+      sel.innerHTML = CLI_OFFICERS.map(name => `
+        <option value="${name}" ${name === currentGlobalOfficer ? 'selected' : ''}>${name}</option>
+      `).join('');
+    }
+
+    function changeGlobalOfficer(name) {
+      currentGlobalOfficer = name;
+      Storage.set('ACTIVE_OFFICER', name);
+      if (currentTab === 'dashboard') {
+        renderDashboard(document.getElementById('app-container'));
+      }
+      safeCreateIcons();
+    }
+
+    function toggleThemeMode() {
+      currentThemeMode = currentThemeMode === 'dark' ? 'light' : 'dark';
+      Storage.set('THEME_MODE', currentThemeMode);
+      applyTheme();
+    }
+
+    function applyTheme() {
+      const icon = document.getElementById('theme-icon');
+      if (currentThemeMode === 'dark') {
+        document.body.classList.add('theme-dark');
+        if (icon) icon.setAttribute('data-lucide', 'sun');
+      } else {
+        document.body.classList.remove('theme-dark');
+        if (icon) icon.setAttribute('data-lucide', 'moon');
+      }
+      safeCreateIcons();
+    }
+
+    function safeCreateIcons() {
+      try {
+        if (window.lucide && typeof lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      } catch (e) {}
+    }
+
+    let currentTab = 'dashboard';
+
+    function navigate(tabId) {
+      try {
+        currentTab = tabId;
+        document.querySelectorAll('.nav-pill').forEach(btn => {
+          btn.classList.remove('text-sky-500', 'bg-sky-500/15', 'border-sky-500/30');
+          btn.classList.add('text-slate-700', 'dark:text-slate-300');
+        });
+        const activeBtn = document.getElementById('nav-' + tabId);
+        if (activeBtn) {
+          activeBtn.classList.add('text-sky-500', 'bg-sky-500/15', 'border-sky-500/30');
+          activeBtn.classList.remove('text-slate-700', 'dark:text-slate-300');
+        }
+
+        const container = document.getElementById('app-container');
+        if (!container) return;
+
+        if (tabId === 'dashboard') renderDashboard(container);
+        else if (tabId === 'input-violation') renderInputViolation(container);
+        else if (tabId === 'permissions') renderPermissions(container);
+        else if (tabId === 'collaboration') renderCollaboration(container);
+        else if (tabId === 'violations') renderDataViolations(container);
+        else if (tabId === 'students') renderStudents(container);
+        else if (tabId === 'reports') renderReports(container);
+        else if (tabId === 'backup') renderBackup(container);
+        else if (tabId === 'categories') renderCategories(container);
+
+        safeCreateIcons();
+      } catch (err) {
+        console.error("Navigation error:", err);
+      }
+    }
+
+    function getTodayString() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function calculateSopSanction(level, callCount) {
+      if (level === 'RINGAN') {
+        if (callCount <= 1) return "Panggilan 1: Menulis 20 mufrodat.";
+        if (callCount === 2) return "Panggilan 2: Menulis 30 mufrodat, Menghafal 2 judul daily conversation.";
+        return "Panggilan 3: Menulis 40 mufrodat, Menulis dan menghafal 3 judul daily conversation.";
+      } else if (level === 'SEDANG') {
+        if (callCount <= 1) return "Panggilan 1: Menulis 50 mufrodat, Menulis 2 judul daily conversation.";
+        if (callCount === 2) return "Panggilan 2: Menulis 60 mufrodat, Menulis dan menghafal 3 judul daily conversation.";
+        return "Panggilan 3: Menulis dan menghafal 20 uslub, Menulis dan menghafal 5 judul daily conversation.";
+      } else {
+        if (callCount <= 1) return "Panggilan 1: Menulis dan menghafal 50 mufrodat, Menggunakan papan 3 hari.";
+        if (callCount === 2) return "Panggilan 2: Menulis dan menghafal 30 uslub, menghafal 3 judul daily conversation, Menggunakan papan 3 hari.";
+        return "Panggilan 3: Menulis dan menghafal 40 uslub, Menghafal 3 judul daily conversation, Menggunakan papan 5 hari, Menggunakan kerudung pelanggaran bahasa.";
+      }
+    }
+
+    let activePlayerSource = 'youtube';
+    function switchMusicSource(src) {
+      activePlayerSource = src;
+      const btnYt = document.getElementById('btn-src-yt');
+      const btnSp = document.getElementById('btn-src-sp');
+      const frame = document.getElementById('music-iframe');
+      if (!frame) return;
+
+      if (src === 'youtube') {
+        if (btnYt) btnYt.className = 'py-1.5 rounded-lg bg-sky-500 text-white shadow-xs text-center transition';
+        if (btnSp) btnSp.className = 'py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center';
+        frame.src = 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1';
+      } else {
+        if (btnSp) btnSp.className = 'py-1.5 rounded-lg bg-sky-500 text-white shadow-xs text-center transition';
+        if (btnYt) btnYt.className = 'py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center';
+        frame.src = 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0';
+      }
+    }
+
+    function playPresetMusic(type) {
+      const frame = document.getElementById('music-iframe');
+      if (!frame) return;
+      if (type === 'lofi') frame.src = 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1';
+      else if (type === 'instrumental') frame.src = 'https://www.youtube.com/embed/lTRiuFIWV54?autoplay=1';
+      else if (type === 'quran') frame.src = 'https://www.youtube.com/embed/1_Y96z-d1K0?autoplay=1';
+      switchMusicSource('youtube');
+    }
+
+    function updateMusicTrack() {
+      const input = document.getElementById('music-url-input')?.value.trim();
+      const frame = document.getElementById('music-iframe');
+      if (!input || !frame) return;
+
+      if (input.includes('spotify.com')) {
+        let embedUrl = input.includes('/embed/') ? input : input.replace('spotify.com/', 'spotify.com/embed/');
+        frame.src = embedUrl;
+        switchMusicSource('spotify');
+      } else {
+        const m = input.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+        if (m && m[1]) {
+          frame.src = `https://www.youtube.com/embed/${m[1]}?autoplay=1`;
+          switchMusicSource('youtube');
+        } else {
+          alert('Tautan tidak valid. Masukkan URL YouTube atau Spotify.');
+        }
+      }
+    }
+
+    let currentQuoteIndex = 0;
+    function getNextQuote() {
+      currentQuoteIndex = (currentQuoteIndex + 1) % ORGANIZATION_QUOTES.length;
+      const el = document.getElementById('dash-org-quote');
+      if (el) el.innerText = ORGANIZATION_QUOTES[currentQuoteIndex];
+    }
+
+    function renderDashboard(container) {
+      const today = getTodayString();
+      const todayViolations = (DB.violations || []).filter(v => v.date === today && v.status !== 'DELETED');
+      const todayPermissions = (DB.permissions || []).filter(p => p.date === today);
+
+      const countRingan = todayViolations.filter(v => v.level === 'RINGAN').length;
+      const countSedang = todayViolations.filter(v => v.level === 'SEDANG').length;
+      const countBerat = todayViolations.filter(v => v.level === 'BERAT').length;
+
+      const recentList = [...(DB.violations || [])].filter(v => v.status !== 'DELETED').reverse().slice(0, 5);
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <!-- KOLOM 1: MUSIC PLAYER WIDGET -->
+          <div class="lg:col-span-3 cli-card border rounded-3xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                  <i data-lucide="music" class="w-4 h-4"></i>
+                </div>
+                <span class="text-xs font-extrabold text-slate-900 dark:text-white">Music Player</span>
+              </div>
+              <span class="text-[9px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wider">
+                FULL PLAY
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 p-1 cli-inner rounded-xl border text-xs font-bold">
+              <button onclick="switchMusicSource('youtube')" id="btn-src-yt" class="py-1.5 rounded-lg bg-sky-500 text-white shadow-xs text-center transition">
+                YouTube Full
+              </button>
+              <button onclick="switchMusicSource('spotify')" id="btn-src-sp" class="py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition text-center">
+                Spotify
+              </button>
+            </div>
+
+            <div id="music-frame-container" class="w-full rounded-2xl overflow-hidden cli-inner border">
+              <iframe id="music-iframe" class="w-full h-44 rounded-2xl" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+            </div>
+
+            <div class="flex items-center gap-1.5 pt-1">
+              <button onclick="playPresetMusic('lofi')" class="flex-1 py-1 px-2 cli-inner border rounded-lg text-[10px] font-bold hover:border-sky-500 transition text-center text-slate-900 dark:text-white">☕ Lofi 24/7</button>
+              <button onclick="playPresetMusic('instrumental')" class="flex-1 py-1 px-2 cli-inner border rounded-lg text-[10px] font-bold hover:border-sky-500 transition text-center text-slate-900 dark:text-white">🎻 Fokus</button>
+              <button onclick="playPresetMusic('quran')" class="flex-1 py-1 px-2 cli-inner border rounded-lg text-[10px] font-bold hover:border-sky-500 transition text-center text-slate-900 dark:text-white">📖 Murottal</button>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <span class="text-[11px] text-slate-700 dark:text-slate-300 block font-medium">Link Custom (Video / Playlist):</span>
+              <div class="flex gap-2">
+                <input 
+                  type="text" 
+                  id="music-url-input" 
+                  placeholder="Paste link YouTube / Spotify..." 
+                  class="flex-1 cli-inner border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white"
+                />
+                <button onclick="updateMusicTrack()" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition">
+                  Set
+                </button>
+              </div>
+              <p class="text-[10px] text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="headphones" class="w-3.5 h-3.5 text-sky-500"></i>
+                <span>Gunakan YouTube untuk musik full durasi tanpa jeda 30 detik!</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- KOLOM 2: CENTER HUB -->
+          <div class="lg:col-span-6 space-y-5">
+            <div class="hero-gradient rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden">
+              <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div class="space-y-2">
+                  <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-white">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Monitoring Bahasa Santriwati Aktif</span>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+                    Selamat Datang,<br>${currentGlobalOfficer} 👋
+                  </h2>
+                  <p class="text-white/90 text-xs max-w-sm leading-relaxed" id="dash-org-quote">
+                    ${ORGANIZATION_QUOTES[currentQuoteIndex]}
+                  </p>
+                  <button onclick="getNextQuote()" class="text-[10px] text-sky-200 hover:text-white underline font-semibold flex items-center gap-1 pt-1">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i> Ganti Motivasi Organisasi
+                  </button>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-3.5 rounded-2xl flex items-center gap-3 shrink-0">
+                  <div class="w-10 h-10 rounded-xl bg-white text-sky-600 flex items-center justify-center font-bold">
+                    <i data-lucide="calendar" class="w-5 h-5 text-sky-600"></i>
+                  </div>
+                  <div class="text-xs">
+                    <span class="text-white/70 block text-[10px] font-semibold">Hari Ini: ${new Date().toLocaleDateString('id-ID', { weekday: 'long' })}</span>
+                    <span class="text-white font-extrabold text-xs block">Ilqo Mufrodat & Bahasa</span>
+                    <span class="text-sky-200 text-[10px] font-mono">Kelas 7G - 12G • LCD Team</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3 Stat Cards Utama -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="cli-card border p-4 rounded-2xl shadow-xs">
+                <div class="flex items-center justify-between text-slate-700 dark:text-slate-300 text-xs font-bold mb-1">
+                  <span>TOTAL PELANGGARAN</span>
+                  <i data-lucide="alert-triangle" class="w-4 h-4 text-sky-500"></i>
+                </div>
+                <div class="text-3xl font-black mt-1 text-slate-900 dark:text-white">${todayViolations.length}</div>
+                <p class="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">Total hari ini (${today})</p>
+              </div>
+
+              <div class="cli-card border p-4 rounded-2xl shadow-xs">
+                <div class="flex items-center justify-between text-slate-700 dark:text-slate-300 text-xs font-bold mb-1">
+                  <span>SANTRIWATI AKTIF</span>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+                </div>
+                <div class="text-3xl font-black text-emerald-500 mt-1">${DB.students.length}</div>
+                <p class="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">Master Data 7G - 12G</p>
+              </div>
+
+              <div class="cli-card border p-4 rounded-2xl shadow-xs">
+                <div class="flex items-center justify-between text-slate-700 dark:text-slate-300 text-xs font-bold mb-1">
+                  <span>IZIN HARI INI</span>
+                  <i data-lucide="file-check" class="w-4 h-4 text-indigo-500"></i>
+                </div>
+                <div class="text-3xl font-black text-indigo-500 mt-1">${todayPermissions.length}</div>
+                <p class="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">Format Perizinan Mba Fita</p>
+              </div>
+            </div>
+
+            <!-- KARTU PEMISAH BOBOT HARI INI -->
+            <div class="cli-card border rounded-3xl p-5 shadow-xs space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-extrabold tracking-wide uppercase text-slate-900 dark:text-white">Klasifikasi Tingkat Bobot Hari Ini</h3>
+                  <p class="text-[10px] text-slate-600 dark:text-slate-400">Pemisahan otomatis berdasarkan SOP Disiplin Bagian Bahasa</p>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 bg-sky-500/10 text-sky-500 font-bold rounded-full border border-sky-500/20">Auto Segregated</span>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-3 cli-inner rounded-2xl border border-amber-500/30">
+                  <span class="text-[10px] font-bold text-amber-500 block uppercase">Ringan</span>
+                  <span class="text-2xl font-black text-amber-500 mt-1 block">${countRingan}</span>
+                  <span class="text-[9px] text-slate-600 dark:text-slate-400 block">Aku-Kamu / Telat</span>
+                </div>
+                <div class="p-3 cli-inner rounded-2xl border border-orange-500/30">
+                  <span class="text-[10px] font-bold text-orange-500 block uppercase">Sedang</span>
+                  <span class="text-2xl font-black text-orange-500 mt-1 block">${countSedang}</span>
+                  <span class="text-[9px] text-slate-600 dark:text-slate-400 block">Bahasa Daerah / Alpa</span>
+                </div>
+                <div class="p-3 cli-inner rounded-2xl border border-rose-500/30">
+                  <span class="text-[10px] font-bold text-rose-500 block uppercase">Berat</span>
+                  <span class="text-2xl font-black text-rose-500 mt-1 block">${countBerat}</span>
+                  <span class="text-[9px] text-slate-600 dark:text-slate-400 block">Kasar / Papan Sanksi</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rekap Input Terbaru Table -->
+            <div class="cli-card border rounded-3xl p-5 shadow-xs space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-extrabold tracking-wide uppercase text-slate-900 dark:text-white">Rekap Input Terbaru</h3>
+                  <p class="text-[10px] text-slate-600 dark:text-slate-400">Data pelanggaran santriwati terkini</p>
+                </div>
+                <button onclick="navigate('violations')" class="text-xs font-bold text-sky-500 hover:underline flex items-center gap-1">
+                  Lihat Semua <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              ${recentList.length === 0 ? `
+                <div class="py-8 text-center text-slate-600 dark:text-slate-400 text-xs font-medium">
+                  Belum ada catatan pelanggaran santriwati hari ini.
+                </div>
+              ` : `
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-bold tracking-wider">
+                      <tr>
+                        <th class="pb-2.5">Tanggal</th>
+                        <th class="pb-2.5">Nama Santriwati</th>
+                        <th class="pb-2.5">Kelas</th>
+                        <th class="pb-2.5">Tingkatan</th>
+                        <th class="pb-2.5">Bentuk Pelanggaran</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs font-medium">
+                      ${recentList.map(v => `
+                        <tr class="hover:bg-sky-500/5 transition">
+                          <td class="py-2.5 text-slate-600 dark:text-slate-400 text-[11px] font-mono">${v.date}</td>
+                          <td class="py-2.5 font-bold text-slate-900 dark:text-white">${v.student_name}</td>
+                          <td class="py-2.5 text-slate-700 dark:text-slate-300 font-semibold">${v.student_class}</td>
+                          <td class="py-2.5">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${
+                              v.level === 'BERAT' ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30' :
+                              v.level === 'SEDANG' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
+                              'bg-amber-500/20 text-amber-500 border border-amber-500/30'
+                            }">${v.level}</span>
+                          </td>
+                          <td class="py-2.5 font-medium text-slate-800 dark:text-slate-200">${v.category_name}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- KOLOM 3: CLI ASSISTANT KECE -->
+          <div class="lg:col-span-3 cli-card border rounded-3xl p-5 shadow-xs flex flex-col justify-between h-[630px]">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-xs font-black leading-tight text-slate-900 dark:text-white">CLI Assistant Kece</h3>
+                    <span class="text-[9px] text-emerald-500 font-bold block flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Groq Fast Active
+                    </span>
+                  </div>
+                </div>
+                <button onclick="openAiSettingsModal()" class="p-1 rounded-lg text-slate-700 dark:text-slate-300 hover:text-sky-500 transition" title="Set Groq API Key">
+                  <i data-lucide="settings" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <div id="ai-dashboard-messages" class="py-3 h-[450px] overflow-y-auto space-y-2.5 text-xs custom-scroll font-medium">
+                <div class="cli-inner p-3 rounded-2xl rounded-tl-xs border leading-relaxed text-slate-800 dark:text-slate-200">
+                  Halo Kak <strong class="text-sky-500">${currentGlobalOfficer.split(' ')[0]}</strong>! Aku <strong>CLI Assistant Kece</strong> 🌸. Mau cek data santriwati, anggota LCD, aturan SOP sanksi (mufrodat, conversation, uslub, papan), atau buat draf perizinan bahasa? Tulis aja langsung ya!
+                </div>
+              </div>
+            </div>
+
+            <form onsubmit="handleSendDashboardAi(event)" class="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+              <input 
+                type="text" 
+                id="ai-dashboard-input" 
+                placeholder="Ketik pesan / tanya data..." 
+                class="flex-1 cli-inner border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white"
+              />
+              <button type="submit" class="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xs transition shrink-0">
+                <i data-lucide="send" class="w-4 h-4"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // DYNAMIC GROQ AI ENGINE
+    // ==========================================
+    async function handleSendDashboardAi(e) {
+      e.preventDefault();
+      const input = document.getElementById('ai-dashboard-input');
+      const text = input?.value.trim();
+      if (!text) return;
+
+      const container = document.getElementById('ai-dashboard-messages');
+      if (!container) return;
+
+      container.innerHTML += `
+        <div class="bg-sky-600 text-white p-2.5 rounded-2xl rounded-tr-xs max-w-[85%] ml-auto text-xs shadow-xs">
+          ${text}
+        </div>
+      `;
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+
+      const activeKey = DB.groqApiKey || DEFAULT_GROQ_KEY;
+      if (!activeKey || !activeKey.startsWith("gsk_")) {
+        container.innerHTML += `
+          <div class="bg-rose-500/20 text-rose-500 p-2.5 rounded-2xl rounded-tl-xs border border-rose-500/30 text-xs font-semibold">
+            Groq API Key belum valid. Klik ikon gerigi pengaturan di kanan atas kotak asisten ini untuk mengisi API Key ya Kak!
+          </div>
+        `;
+        container.scrollTop = container.scrollHeight;
+        return;
+      }
+
+      container.innerHTML += `<div id="ai-loading-dash" class="text-slate-600 dark:text-slate-400 italic text-[11px] font-medium">CLI Assistant Kece sedang mengetik... ⚡</div>`;
+      container.scrollTop = container.scrollHeight;
+
+      try {
+        const systemPrompt = `Kamu adalah CLI Assistant Kece: Asisten AI Cerdas, Ramah, Sopan & Energik untuk Bagian Bahasa (CLI) Pondok Pesantren Modern ZIIS Putri Cilongok.
+Petugas aktif saat ini: ${currentGlobalOfficer}.
+Total data santriwati: ${DB.students.length}.
+Program bahasa: Ilqo Mufrodat (harian Ahad-Jumat), Muhadatsah (Sabtu), Language Event (Ahad).
+SOP Pelanggaran: Ringan (Aku-Kamu, Telat), Sedang (Bahasa Daerah Jawa/Sunda, Alpa 1-2x), Berat (Bahasa Kasar/Kotor, Alpa >=3x). Sanksi bertingkat mulai dari menulis mufrodat, daily conversation, uslub, papan bahasa, hingga kerudung pelanggaran.
+Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason (Alasan). Jawablah dengan lugas, ramah, dan solutif.`;
+
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeKey}`
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-8b-instant',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: text }
+            ],
+            temperature: 0.7,
+            max_tokens: 600
+          })
+        });
+
+        document.getElementById('ai-loading-dash')?.remove();
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.choices[0].message.content;
+          container.innerHTML += `
+            <div class="cli-inner p-2.5 rounded-2xl rounded-tl-xs border text-xs whitespace-pre-line leading-relaxed text-slate-900 dark:text-white font-medium">
+              ${reply}
+            </div>
+          `;
+        } else {
+          container.innerHTML += `
+            <div class="bg-rose-500/20 text-rose-500 p-2.5 rounded-2xl rounded-tl-xs border border-rose-500/30 text-xs font-semibold">
+              Gagal menghubungi Groq API. Pastikan API Key valid atau kuota mencukupi.
+            </div>
+          `;
+        }
+      } catch (err) {
+        document.getElementById('ai-loading-dash')?.remove();
+        container.innerHTML += `
+          <div class="bg-rose-500/20 text-rose-500 p-2.5 rounded-2xl rounded-tl-xs border border-rose-500/30 text-xs font-semibold">
+            Gangguan koneksi internet: ${err.message}
+          </div>
+        `;
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // ==========================================
+    // 2. INPUT PELANGGARAN KASIR
+    // ==========================================
+    let selectedStudentInput = null;
+
+    function renderInputViolation(container) {
+      const today = getTodayString();
+
+      container.innerHTML = `
+        <div class="max-w-3xl mx-auto cli-card rounded-3xl border shadow-sm p-6 sm:p-8 space-y-5">
+          <div class="flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Kasir Pencatatan Pelanggaran Bahasa</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Mode kasir cepat untuk santriwati ZIIS Putri dengan kalkulasi sanksi otomatis.</p>
+            </div>
+            <span class="text-xs bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-3 py-1 rounded-full border border-emerald-500/30">
+              ⚡ POS Mode
+            </span>
+          </div>
+
+          <div id="violation-toast" class="hidden p-4 rounded-2xl text-xs font-bold"></div>
+
+          <form id="violation-form" onsubmit="handleSaveViolation(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Tanggal Pelanggaran *</label>
+                <input type="date" id="v-date" value="${today}" required class="w-full cli-inner border rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Sesi Agenda *</label>
+                <select id="v-session" class="w-full cli-inner border rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="Ilqo Mufrodat">Ilqo Mufrodat (Harian)</option>
+                  <option value="Muhadatsah (Sabtu)">Muhadatsah (Sabtu)</option>
+                  <option value="Language Event (Ahad)">Language Event (Ahad)</option>
+                  <option value="Di Luar Sesi / Jam Bebas">Di Luar Sesi / Jam Bebas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="relative">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Pilih Santriwati (Nama / ID) *</label>
+              <div class="relative">
+                <input
+                  type="text"
+                  id="v-student-search"
+                  placeholder="Ketik minimal 2 huruf nama santriwati..."
+                  autocomplete="off"
+                  oninput="handleStudentSearch(this.value)"
+                  class="w-full cli-inner border rounded-xl p-2.5 pl-9 text-xs font-medium focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white"
+                />
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+              </div>
+              <div id="student-search-results" class="hidden absolute z-30 w-full cli-card border rounded-2xl shadow-2xl mt-1 max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800"></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kelas Santriwati (Otomatis)</label>
+                <input type="text" id="v-student-class" readonly value="— Pilih santriwati di atas —" class="w-full cli-inner opacity-75 border text-slate-500 dark:text-slate-400 rounded-xl p-2.5 text-xs font-bold cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Riwayat Pelanggaran Sebelumnya</label>
+                <input type="text" id="v-student-history" readonly value="—" class="w-full cli-inner opacity-75 border text-slate-500 dark:text-slate-400 rounded-xl p-2.5 text-xs font-bold cursor-not-allowed" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Pilih Kategori Pelanggaran *</label>
+              <select id="v-category" onchange="updateViolationLevelPreview()" required class="w-full cli-inner border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                <option value="">-- Pilih Jenis Pelanggaran SOP --</option>
+                ${(DB.categories || []).map(c => `
+                  <option value="${c.category_id}">[${c.default_level}]${c.category_name}</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <div id="v-sanction-box" class="hidden p-3.5 cli-inner border rounded-2xl space-y-1">
+              <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">Sanksi Sesuai SOP Bagian Bahasa:</span>
+              <p id="v-sanction-text" class="text-xs font-extrabold text-sky-500"></p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Keterangan / Kronologi Tambahan</label>
+              <input type="text" id="v-desc" placeholder="Contoh: Berbicara bahasa jawa di kamar mandi / ruang makan..." class="w-full cli-inner border rounded-xl p-2.5 text-xs font-medium focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white" />
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              <span>Simpan Catatan Pelanggaran</span>
+            </button>
+          </form>
+        </div>
+      `;
+
+      selectedStudentInput = null;
+    }
+
+    function handleStudentSearch(q) {
+      const resContainer = document.getElementById('student-search-results');
+      if (!resContainer) return;
+      if (!q || q.length < 2) {
+        resContainer.classList.add('hidden');
+        return;
+      }
+      const matches = (DB.students || []).filter(s => 
+        s.name.toLowerCase().includes(q.toLowerCase()) || 
+        s.id.toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 10);
+
+      if (matches.length === 0) {
+        resContainer.innerHTML = `<div class="p-3 text-xs text-slate-600 dark:text-slate-400 text-center font-medium">Santriwati tidak ditemukan.</div>`;
+      } else {
+        resContainer.innerHTML = matches.map(s => `
+          <div onclick="selectStudentForInput('${s.id}')" class="p-3 hover:bg-sky-500/10 cursor-pointer flex justify-between items-center text-xs transition">
+            <div>
+              <span class="font-bold text-slate-900 dark:text-white">${s.name}</span>
+              ${s.is_lcd ? '<span class="ml-1.5 text-[9px] bg-pink-500/20 text-pink-500 border border-pink-500/30 px-1 py-0.5 rounded font-black">LCD CORE</span>' : ''}
+              <div class="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5 font-mono">${s.id}</div>
+            </div>
+            <span class="px-2 py-0.5 bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30 font-bold rounded-full text-[10px]">Kelas ${s.class}</span>
+          </div>
+        `).join('');
+      }
+      resContainer.classList.remove('hidden');
+    }
+
+    function selectStudentForInput(id) {
+      const s = (DB.students || []).find(item => item.id === id);
+      if (!s) return;
+      selectedStudentInput = s;
+      document.getElementById('v-student-search').value = `${s.name} (${s.id})`;
+      document.getElementById('v-student-class').value = `Kelas ${s.class}`;
+      
+      const prevCount = (DB.violations || []).filter(v => v.student_id === s.id && v.status !== 'DELETED').length;
+      document.getElementById('v-student-history').value = `${prevCount} Pelanggaran Tercatat`;
+      document.getElementById('student-search-results')?.classList.add('hidden');
+
+      updateViolationLevelPreview();
+    }
+
+    function updateViolationLevelPreview() {
+      const catId = document.getElementById('v-category')?.value;
+      const box = document.getElementById('v-sanction-box');
+      const text = document.getElementById('v-sanction-text');
+      if (!catId || !selectedStudentInput) {
+        box?.classList.add('hidden');
+        return;
+      }
+
+      const cat = DB.categories.find(c => c.category_id === catId);
+      if (!cat) return;
+
+      const sameLevelCount = (DB.violations || []).filter(v => v.student_id === selectedStudentInput.id && v.level === cat.default_level && v.status !== 'DELETED').length;
+      const currentCall = sameLevelCount + 1;
+      const sanction = calculateSopSanction(cat.default_level, currentCall);
+
+      box.classList.remove('hidden');
+      text.innerText = `[${cat.default_level}] Panggilan ke-${currentCall} ➔ ${sanction}`;
+    }
+
+    function handleSaveViolation(e) {
+      e.preventDefault();
+      const toast = document.getElementById('violation-toast');
+
+      if (!selectedStudentInput) {
+        if (toast) {
+          toast.className = 'p-4 rounded-2xl text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30 block';
+          toast.innerText = 'Pilih santriwati dari daftar autocomplete terlebih dahulu!';
+        }
+        return;
+      }
+
+      const catId = document.getElementById('v-category')?.value;
+      const cat = DB.categories.find(c => c.category_id === catId);
+      if (!cat) return;
+
+      const sameLevelCount = (DB.violations || []).filter(v => v.student_id === selectedStudentInput.id && v.level === cat.default_level && v.status !== 'DELETED').length;
+      const currentCall = sameLevelCount + 1;
+      const sanction = calculateSopSanction(cat.default_level, currentCall);
+
+      const record = {
+        violation_id: 'VIO-' + Date.now(),
+        date: document.getElementById('v-date')?.value || getTodayString(),
+        session: document.getElementById('v-session')?.value || 'Ilqo Mufrodat',
+        student_id: selectedStudentInput.id,
+        student_name: selectedStudentInput.name,
+        student_class: selectedStudentInput.class,
+        category_id: cat.category_id,
+        category_name: cat.category_name,
+        level: cat.default_level,
+        call_count: currentCall,
+        sanction: sanction,
+        description: document.getElementById('v-desc')?.value.trim() || '',
+        officer: currentGlobalOfficer,
+        status: 'BELUM_SELESAI',
+        created_at: new Date().toISOString()
+      };
+
+      DB.violations.push(record);
+      saveDB();
+
+      alert(`Berhasil menyimpan catatan pelanggaran untuk ${selectedStudentInput.name}!`);
+      navigate('violations');
+    }
+
+    // ==========================================
+    // 3. BUKU PERIZINAN BAHASA
+    // ==========================================
+    function renderPermissions(container) {
+      container.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Buku Perizinan Bagian Bahasa</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Format izin resmi: Tanggal, Nama, Kelas, Agenda yang Ditinggalkan, dan Reason (Alasan).</p>
+            </div>
+            <button onclick="openPermissionModal()" class="py-2.5 px-5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Buat Izin Santriwati</span>
+            </button>
+          </div>
+
+          <div class="cli-card rounded-3xl border shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs font-bold text-slate-900 dark:text-white">
+              <span>Arsip Perizinan Masuk</span>
+              <span class="text-slate-600 dark:text-slate-400">${(DB.permissions || []).length} Santriwati Berizin</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="cli-inner border-b font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="p-4 w-12 text-center">No</th>
+                    <th class="p-4 w-28">Tanggal</th>
+                    <th class="p-4">Nama Santriwati</th>
+                    <th class="p-4 w-24">Kelas</th>
+                    <th class="p-4">Agenda Terlewat</th>
+                    <th class="p-4">Reason / Alasan</th>
+                    <th class="p-4">Petugas</th>
+                    <th class="p-4 text-center w-24">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                  ${(DB.permissions || []).slice().reverse().map((p, idx) => `
+                    <tr class="hover:bg-sky-500/5 transition">
+                      <td class="p-4 text-center text-slate-600 dark:text-slate-400 font-bold">${idx + 1}</td>
+                      <td class="p-4 font-mono font-medium text-slate-600 dark:text-slate-400">${p.date}</td>
+                      <td class="p-4 font-bold text-slate-900 dark:text-white">${p.student_name}</td>
+                      <td class="p-4 font-semibold text-slate-700 dark:text-slate-300">${p.student_class}</td>
+                      <td class="p-4"><span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">${p.agenda}</span></td>
+                      <td class="p-4 font-medium text-slate-800 dark:text-slate-200">
+                        <span class="text-sky-500 font-bold block text-[11px]">${p.category}</span>
+                        <span class="text-slate-600 dark:text-slate-400 text-[11px] italic">"${p.reason}"</span>
+                      </td>
+                      <td class="p-4 text-slate-700 dark:text-slate-300 font-medium">${p.officer}</td>
+                      <td class="p-4 text-center">
+                        <button onclick="deletePermission('${p.perm_id}')" class="p-1 hover:bg-rose-500/10 text-slate-600 dark:text-slate-400 hover:text-rose-500 rounded-lg transition">
+                          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                  ${(DB.permissions || []).length === 0 ? '<tr><td colspan="8" class="p-10 text-center text-slate-600 dark:text-slate-400 font-medium">Belum ada perizinan tercatat.</td></tr>' : ''}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let permSelectedStudent = null;
+    function openPermissionModal() {
+      const today = getTodayString();
+
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Form Perizinan Bagian Bahasa</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Format: Tanggal, Nama, Kelas, Agenda, dan Reason</p>
+          </div>
+
+          <form onsubmit="handleSavePermission(event)" class="space-y-4">
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tanggal Izin *</label>
+              <input type="date" id="perm-date" value="${today}" required class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-semibold text-slate-900 dark:text-white" />
+            </div>
+
+            <div class="relative">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Santriwati *</label>
+              <input 
+                type="text" 
+                id="perm-student-search" 
+                oninput="handlePermStudentSearch(this.value)" 
+                placeholder="Ketik minimal 2 huruf nama santriwati..." 
+                required 
+                class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" 
+              />
+              <div id="perm-dropdown" class="hidden absolute top-14 left-0 w-full cli-card rounded-2xl shadow-2xl border p-2 max-h-48 overflow-y-auto z-50"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kelas (Otomatis)</label>
+                <input type="text" id="perm-class" readonly value="—" class="w-full cli-inner opacity-75 border rounded-xl p-2.5 font-bold cursor-not-allowed text-slate-500 dark:text-slate-400" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Agenda Terlewat *</label>
+                <select id="perm-agenda" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="Ilqo Mufrodat">Ilqo Mufrodat (Harian)</option>
+                  <option value="Muhadatsah (Sabtu)">Muhadatsah (Sabtu)</option>
+                  <option value="Language Event (Ahad)">Language Event (Ahad)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori Izin</label>
+              <select id="perm-cat" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                <option value="Sakit">Sakit (Klinik / Asrama)</option>
+                <option value="Pulang">Pulang ke Rumah / Izin Syar'i</option>
+                <option value="Keperluan Pribadi">Keperluan Pribadi</option>
+                <option value="Dispensasi Lomba / Acara">Dispensasi Lomba / Acara</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Reason (Alasan Lengkap) *</label>
+              <textarea id="perm-reason" required rows="3" placeholder="Uraikan alasan perizinan santriwati..." class="w-full cli-inner border rounded-xl p-2.5 focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Simpan Izin</button>
+            </div>
+          </form>
+        </div>
+      `);
+      permSelectedStudent = null;
+    }
+
+    function handlePermStudentSearch(q) {
+      const box = document.getElementById('perm-dropdown');
+      if (!box) return;
+      if (!q || q.length < 2) { box.classList.add('hidden'); return; }
+
+      const list = (DB.students || []).filter(s => s.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
+      if (list.length === 0) {
+        box.innerHTML = `<div class="p-3 text-xs text-slate-600 dark:text-slate-400 text-center font-medium">Tidak ditemukan.</div>`;
+      } else {
+        box.innerHTML = list.map(s => `
+          <div onclick="selectPermStudent('${s.id}')" class="p-2 hover:bg-sky-500/10 cursor-pointer rounded-lg flex justify-between items-center text-xs">
+            <span class="font-bold text-slate-900 dark:text-white">${s.name}</span>
+            <span class="text-slate-600 dark:text-slate-400 font-semibold">Kelas ${s.class}</span>
+          </div>
+        `).join('');
+      }
+      box.classList.remove('hidden');
+    }
+
+    function selectPermStudent(id) {
+      const s = (DB.students || []).find(item => item.id === id);
+      if (!s) return;
+      permSelectedStudent = s;
+      document.getElementById('perm-student-search').value = s.name;
+      document.getElementById('perm-class').value = s.class;
+      document.getElementById('perm-dropdown').classList.add('hidden');
+    }
+
+    function handleSavePermission(e) {
+      e.preventDefault();
+      if (!permSelectedStudent) {
+        alert("Pilih santriwati dari daftar autocomplete terlebih dahulu!");
+        return;
+      }
+
+      DB.permissions.push({
+        perm_id: 'PRM-' + Date.now(),
+        date: document.getElementById('perm-date').value,
+        student_id: permSelectedStudent.id,
+        student_name: permSelectedStudent.name,
+        student_class: permSelectedStudent.class,
+        agenda: document.getElementById('perm-agenda').value,
+        category: document.getElementById('perm-cat').value,
+        reason: document.getElementById('perm-reason').value.trim(),
+        officer: currentGlobalOfficer,
+        created_at: new Date().toISOString()
+      });
+
+      saveDB();
+      closeModal();
+      navigate('permissions');
+    }
+
+    function deletePermission(id) {
+      if (confirm('Hapus data izin ini?')) {
+        DB.permissions = (DB.permissions || []).filter(p => p.perm_id !== id);
+        saveDB();
+        navigate('permissions');
+      }
+    }
+
+    // ==========================================
+    // 4. SURAT & KOLABORASI LINTAS BAGIAN
+    // ==========================================
+    let activeLetterTab = 'KELUAR';
+
+    function renderCollaboration(container) {
+      container.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Surat & Kolaborasi Lintas Bagian</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Sistem koordinasi, surat masuk & surat keluar resmi antar bagian organisasi ZIIS Putri.</p>
+            </div>
+            <button onclick="openCreateLetterModal()" class="py-2.5 px-5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>Buat Surat / Catat Surat Masuk</span>
+            </button>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="switchLetterTab('KELUAR')" id="btn-tab-keluar" class="px-5 py-2.5 rounded-full font-bold text-xs bg-sky-500 text-white shadow-xs transition">
+              📤 Surat Keluar (Outbox)
+            </button>
+            <button onclick="switchLetterTab('MASUK')" id="btn-tab-masuk" class="px-5 py-2.5 rounded-full font-bold text-xs cli-card text-slate-700 dark:text-slate-300 border hover:bg-sky-500/10 transition">
+              📥 Surat Masuk (Inbox)
+            </button>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold tracking-wider text-slate-700 dark:text-slate-300 uppercase mb-3">Bagian Kolaborasi Organisasi</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              ${COLLABORATION_DIVISIONS.map(div => {
+                const count = (DB.letters || []).filter(l => l.target_division === div || l.source_division === div).length;
+                return `
+                  <div onclick="filterLettersByDivision('${div}')" class="cli-card p-4 rounded-2xl border shadow-xs hover:border-sky-500 cursor-pointer transition text-center">
+                    <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto mb-2">
+                      <i data-lucide="layers" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-[11px] font-bold block leading-tight text-slate-900 dark:text-white">${div}</span>
+                    <span class="text-[10px] text-slate-600 dark:text-slate-400 mt-1 block font-semibold">${count} Dokumen</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="cli-card rounded-3xl border shadow-xs overflow-hidden">
+            <div class="p-5 border-b flex justify-between items-center cli-inner">
+              <h4 id="letter-table-title" class="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Arsip Surat Keluar Resmi</h4>
+              <span class="text-xs text-slate-700 dark:text-slate-300 font-semibold">Total: <strong>${(DB.letters || []).length}</strong> surat tersimpan</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="cli-inner border-b font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <tr>
+                    <th class="p-4 w-12 text-center">No</th>
+                    <th class="p-4">No. Surat</th>
+                    <th class="p-4">Tanggal</th>
+                    <th class="p-4">Bagian Mitra</th>
+                    <th class="p-4">Perihal / Isi Ringkas</th>
+                    <th class="p-4">Petugas</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-center w-28">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="letters-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 font-medium"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      loadLettersTable();
+    }
+
+    function switchLetterTab(tabType) {
+      activeLetterTab = tabType;
+      const btnK = document.getElementById('btn-tab-keluar');
+      const btnM = document.getElementById('btn-tab-masuk');
+      const title = document.getElementById('letter-table-title');
+
+      if (tabType === 'KELUAR') {
+        if (btnK) btnK.className = 'px-5 py-2.5 rounded-full font-bold text-xs bg-sky-500 text-white shadow-xs transition';
+        if (btnM) btnM.className = 'px-5 py-2.5 rounded-full font-bold text-xs cli-card text-slate-700 dark:text-slate-300 border hover:bg-sky-500/10 transition';
+        if (title) title.innerText = 'Arsip Surat Keluar Resmi';
+      } else {
+        if (btnM) btnM.className = 'px-5 py-2.5 rounded-full font-bold text-xs bg-sky-500 text-white shadow-xs transition';
+        if (btnK) btnK.className = 'px-5 py-2.5 rounded-full font-bold text-xs cli-card text-slate-700 dark:text-slate-300 border hover:bg-sky-500/10 transition';
+        if (title) title.innerText = 'Arsip Surat Masuk Resmi';
+      }
+      loadLettersTable();
+    }
+
+    function loadLettersTable(filterDiv = '') {
+      const tbody = document.getElementById('letters-table-body');
+      if (!tbody) return;
+
+      let list = (DB.letters || []).filter(l => (l.type || 'KELUAR') === activeLetterTab);
+      if (filterDiv) {
+        list = list.filter(l => l.target_division === filterDiv || l.source_division === filterDiv);
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-12 text-center text-slate-600 dark:text-slate-400 font-medium">
+              <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+              <span>Belum ada data surat ${activeLetterTab.toLowerCase()} yang tercatat.</span>
+            </td>
+          </tr>
+        `;
+        safeCreateIcons();
+        return;
+      }
+
+      tbody.innerHTML = list.map((l, idx) => `
+        <tr class="hover:bg-sky-500/5 transition">
+          <td class="p-4 text-center text-slate-600 dark:text-slate-400 font-bold">${idx + 1}</td>
+          <td class="p-4 font-mono font-bold text-slate-900 dark:text-white">${l.letter_no}</td>
+          <td class="p-4 font-medium text-slate-600 dark:text-slate-400">${l.date}</td>
+          <td class="p-4"><span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">${activeLetterTab === 'KELUAR' ? l.target_division : l.source_division}</span></td>
+          <td class="p-4 font-semibold text-slate-900 dark:text-white">${l.subject}</td>
+          <td class="p-4 text-slate-700 dark:text-slate-300 font-semibold">${l.officer}</td>
+          <td class="p-4">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+              l.status === 'SELESAI' ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30' :
+              l.status === 'DIPROSES' ? 'bg-sky-500/20 text-sky-500 border border-sky-500/30' :
+              'bg-amber-500/20 text-amber-500 border border-amber-500/30'
+            }">${l.status}</span>
+          </td>
+          <td class="p-4 text-center">
+            <button onclick="openLetterDetail('${l.letter_id}')" class="px-3 py-1 cli-inner hover:bg-sky-500 hover:text-white rounded-xl font-bold text-[11px] transition shadow-xs">
+              Detail
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      safeCreateIcons();
+    }
+
+    function filterLettersByDivision(divName) {
+      loadLettersTable(divName);
+    }
+
+    function openCreateLetterModal() {
+      const today = getTodayString();
+      const autoNum = `0${(DB.letters || []).length + 1}/CLI-ZIIS/${new Date().getMonth() + 1}/${new Date().getFullYear()}`;
+
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Form Surat / Dokumen Lintas Bagian</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Pilih tipe surat (Masuk atau Keluar) untuk pengarsipan resmi Bahasa ZIIS</p>
+          </div>
+
+          <form onsubmit="handleSaveLetter(event)" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Jenis Surat</label>
+                <select id="let-type" onchange="toggleLetterFormFields(this.value)" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="KELUAR">📤 Surat Keluar (Bahasa -> Bagian Lain)</option>
+                  <option value="MASUK">📥 Surat Masuk (Bagian Lain -> Bahasa)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nomor Surat</label>
+                <input type="text" id="let-no" value="${autoNum}" required class="w-full cli-inner border rounded-xl p-2.5 font-mono font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tanggal Surat</label>
+                <input type="date" id="let-date" value="${today}" required class="w-full cli-inner border rounded-xl p-2.5 focus:outline-none focus:border-sky-500 font-semibold text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label id="let-mitra-label" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Bagian Tujuan *</label>
+                <select id="let-mitra" required class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  ${COLLABORATION_DIVISIONS.map(d => `<option value="${d}">${d}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Perihal Surat *</label>
+              <input type="text" id="let-subject" required placeholder="Contoh: Peminjaman area olahraga / jadwal konsumsi Language Event" class="w-full cli-inner border rounded-xl p-2.5 font-semibold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white" />
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Isi Dokumen / Rincian Koordinasi</label>
+              <textarea id="let-content" rows="4" placeholder="Uraikan permohonan, jadwal kegiatan, santriwati terlibat, atau catatan penting..." class="w-full cli-inner border rounded-xl p-2.5 focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Petugas Penanggung Jawab</label>
+                <select id="let-officer" required class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  ${CLI_OFFICERS.map(name => `<option value="${name}" ${name === currentGlobalOfficer ? 'selected' : ''}>${name}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status Disposisi</label>
+                <select id="let-status" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="MENUNGGU">Menunggu Respon</option>
+                  <option value="DIPROSES">Sedang Diproses</option>
+                  <option value="SELESAI">Selesai / Terlaksana</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Simpan Surat</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function toggleLetterFormFields(val) {
+      const label = document.getElementById('let-mitra-label');
+      if (label) {
+        label.innerText = val === 'KELUAR' ? 'Bagian Tujuan *' : 'Bagian Pengirim *';
+      }
+    }
+
+    function handleSaveLetter(e) {
+      e.preventDefault();
+      const type = document.getElementById('let-type')?.value;
+      const mitra = document.getElementById('let-mitra')?.value;
+
+      const newLetter = {
+        letter_id: 'LET-' + Date.now(),
+        type: type,
+        letter_no: document.getElementById('let-no')?.value || '',
+        date: document.getElementById('let-date')?.value || getTodayString(),
+        source_division: type === 'KELUAR' ? "BAGIAN BAHASA (CLI)" : mitra,
+        target_division: type === 'KELUAR' ? mitra : "BAGIAN BAHASA (CLI)",
+        subject: document.getElementById('let-subject')?.value || '',
+        content: document.getElementById('let-content')?.value || '',
+        officer: document.getElementById('let-officer')?.value || currentGlobalOfficer,
+        status: document.getElementById('let-status')?.value || 'MENUNGGU',
+        created_at: new Date().toISOString()
+      };
+
+      DB.letters.push(newLetter);
+      saveDB();
+      closeModal();
+      navigate('collaboration');
+    }
+
+    function openLetterDetail(letterId) {
+      const l = (DB.letters || []).find(item => item.letter_id === letterId);
+      if (!l) return;
+
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800 flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400">NO: ${l.letter_no} (${l.type || 'KELUAR'})</span>
+              <h3 class="text-base font-extrabold mt-1 text-slate-900 dark:text-white">${l.subject}</h3>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">${l.status}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div><span class="text-slate-600 dark:text-slate-400 block font-semibold">Tanggal Surat:</span><span class="font-bold text-slate-900 dark:text-white">${l.date}</span></div>
+            <div><span class="text-slate-600 dark:text-slate-400 block font-semibold">Petugas:</span><span class="font-bold text-sky-500">${l.officer}</span></div>
+            <div><span class="text-slate-600 dark:text-slate-400 block font-semibold">Dari:</span><span class="font-medium text-slate-700 dark:text-slate-300">${l.source_division}</span></div>
+            <div><span class="text-slate-600 dark:text-slate-400 block font-semibold">Tujuan:</span><span class="font-bold text-slate-900 dark:text-white">${l.target_division}</span></div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 dark:border-slate-800">
+            <span class="text-slate-600 dark:text-slate-400 block font-semibold mb-1">Isi Surat / Dokumen:</span>
+            <div class="cli-inner p-4 rounded-2xl border text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-medium">
+              ${l.content || 'Tidak ada uraian rinci.'}
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2">
+            <button onclick="window.print()" class="px-4 py-2 cli-inner hover:bg-sky-500 hover:text-white font-bold rounded-xl flex items-center gap-1.5 transition shadow-xs">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i> Cetak Dokumen
+            </button>
+            <button onclick="closeModal()" class="px-5 py-2 bg-sky-500 hover:bg-sky-600 font-bold rounded-xl text-white shadow-md">Tutup</button>
+          </div>
+        </div>
+      `);
+    }
+
+    // ==========================================
+    // 5. DATA PELANGGARAN & MONITORING SANKSI
+    // ==========================================
+    function renderDataViolations(container) {
+      container.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Data Pelanggaran & Sanksi Bahasa</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Daftar rekapan pelanggaran dan pemenuhan sanksi hafalan mufrodat / uslub / papan sanksi.</p>
+            </div>
+            <button onclick="navigate('input-violation')" class="py-2.5 px-5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Input Pelanggaran</span>
+            </button>
+          </div>
+
+          <div class="cli-card p-4 rounded-2xl border shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <input type="text" id="vio-search" oninput="applyViolationFilters()" placeholder="Cari nama santriwati atau kelas..." class="cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+            <select id="vio-level-filter" onchange="applyViolationFilters()" class="cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+              <option value="ALL">Semua Tingkatan Bobot</option>
+              <option value="RINGAN">Ringan (Aku-Kamu / Telat)</option>
+              <option value="SEDANG">Sedang (Bahasa Daerah / Alpa)</option>
+              <option value="BERAT">Berat (Bahasa Kasar / Alpa >=3)</option>
+            </select>
+            <select id="vio-status-filter" onchange="applyViolationFilters()" class="cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+              <option value="ALL">Semua Status Sanksi</option>
+              <option value="BELUM_SELESAI">Belum Selesai</option>
+              <option value="SUDAH_SETOR">Sudah Setor Sanksi</option>
+            </select>
+          </div>
+
+          <div class="cli-card rounded-3xl border shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="cli-inner border-b font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="p-4 w-12 text-center">No</th>
+                    <th class="p-4 w-28">Tanggal</th>
+                    <th class="p-4">Nama Santriwati</th>
+                    <th class="p-4 w-20">Kelas</th>
+                    <th class="p-4">Bentuk Pelanggaran</th>
+                    <th class="p-4">Sanksi SOP</th>
+                    <th class="p-4 text-center">Status Sanksi</th>
+                    <th class="p-4 text-center w-24">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="violations-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 font-medium"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      applyViolationFilters();
+    }
+
+    function applyViolationFilters() {
+      const tbody = document.getElementById('violations-table-body');
+      if (!tbody) return;
+
+      const q = (document.getElementById('vio-search')?.value || '').toLowerCase();
+      const lvl = document.getElementById('vio-level-filter')?.value || 'ALL';
+      const st = document.getElementById('vio-status-filter')?.value || 'ALL';
+
+      let list = (DB.violations || []).filter(v => v.status !== 'DELETED').slice().reverse();
+
+      if (q) {
+        list = list.filter(v => v.student_name.toLowerCase().includes(q) || v.student_class.toLowerCase().includes(q));
+      }
+      if (lvl !== 'ALL') list = list.filter(v => v.level === lvl);
+      if (st !== 'ALL') list = list.filter(v => v.status === st);
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-600 dark:text-slate-400 font-medium">Tidak ada catatan pelanggaran yang cocok.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((v, idx) => `
+        <tr class="hover:bg-sky-500/5 transition">
+          <td class="p-4 text-center text-slate-600 dark:text-slate-400 font-bold">${idx + 1}</td>
+          <td class="p-4 text-slate-600 dark:text-slate-400 font-mono">${v.date}</td>
+          <td class="p-4 font-bold text-slate-900 dark:text-white">${v.student_name}</td>
+          <td class="p-4 text-slate-700 dark:text-slate-300 font-semibold">${v.student_class}</td>
+          <td class="p-4">
+            <span class="font-bold block text-slate-900 dark:text-white">${v.category_name}</span>
+            <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${
+              v.level === 'BERAT' ? 'bg-rose-500/20 text-rose-500' :
+              v.level === 'SEDANG' ? 'bg-orange-500/20 text-orange-500' : 'bg-amber-500/20 text-amber-500'
+            }">${v.level} • Panggilan ${v.call_count}</span>
+          </td>
+          <td class="p-4 text-[11px] text-sky-600 dark:text-sky-400 font-semibold">${v.sanction}</td>
+          <td class="p-4 text-center">
+            <button onclick="toggleSanctionStatus('${v.violation_id}')" class="px-2.5 py-1 rounded-full text-[10px] font-bold ${
+              v.status === 'SUDAH_SETOR' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-500 border border-rose-500/30'
+            }">
+              ${v.status === 'SUDAH_SETOR' ? '✓ Sudah Setor' : '⚠ Belum Selesai'}
+            </button>
+          </td>
+          <td class="p-4 text-center">
+            <button onclick="deleteViolationRecord('${v.violation_id}')" class="p-1 hover:bg-rose-500/10 text-slate-600 dark:text-slate-400 hover:text-rose-500 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      safeCreateIcons();
+    }
+
+    function toggleSanctionStatus(id) {
+      const v = (DB.violations || []).find(item => item.violation_id === id);
+      if (!v) return;
+      v.status = v.status === 'SUDAH_SETOR' ? 'BELUM_SELESAI' : 'SUDAH_SETOR';
+      saveDB();
+      applyViolationFilters();
+    }
+
+    function deleteViolationRecord(id) {
+      if (confirm('Hapus catatan pelanggaran ini?')) {
+        DB.violations = (DB.violations || []).filter(v => v.violation_id !== id);
+        saveDB();
+        applyViolationFilters();
+      }
+    }
+
+    // ==========================================
+    // 6. MASTER DATA SANTRIWATI & TIM LCD
+    // ==========================================
+    function renderStudents(container) {
+      const lcdCount = (DB.students || []).filter(s => s.is_lcd).length;
+
+      container.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Data Santriwati & Tim Inti LCD</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Master database santriwati dan anggota Language Core Department (LCD). Bisa edit atau tambah rekrutan baru.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 bg-pink-500/10 text-pink-500 border border-pink-500/30 rounded-xl text-xs font-bold">
+                ⭐ ${lcdCount} LCD Team
+              </span>
+              <button onclick="openAddStudentModal()" class="py-2.5 px-4 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Tambah Santriwati / LCD</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="cli-card p-4 rounded-2xl border shadow-xs">
+            <input type="text" id="std-search-field" oninput="filterStudentsTable(this.value)" placeholder="Cari berdasarkan nama atau kelas..." class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+          </div>
+
+          <div class="cli-card rounded-3xl border shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="cli-inner border-b font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th class="p-4 w-12 text-center">No</th>
+                    <th class="p-4 w-28">ID Santriwati</th>
+                    <th class="p-4">Nama Lengkap Santriwati</th>
+                    <th class="p-4 w-28">Kelas</th>
+                    <th class="p-4 w-44">Status LCD</th>
+                    <th class="p-4 text-center w-28">Total Kasus</th>
+                    <th class="p-4 text-center w-28">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="students-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 font-medium"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      filterStudentsTable('');
+    }
+
+    function filterStudentsTable(q) {
+      const tbody = document.getElementById('students-table-body');
+      if (!tbody) return;
+
+      const query = (q || '').toLowerCase();
+      const list = (DB.students || []).filter(s => s.name.toLowerCase().includes(query) || s.class.toLowerCase().includes(query) || s.id.toLowerCase().includes(query));
+
+      tbody.innerHTML = list.map((s, idx) => {
+        const vCount = (DB.violations || []).filter(v => v.student_id === s.id && v.status !== 'DELETED').length;
+        return `
+          <tr class="hover:bg-sky-500/5 transition">
+            <td class="p-4 text-center text-slate-600 dark:text-slate-400 font-bold">${idx + 1}</td>
+            <td class="p-4 font-mono font-semibold text-slate-600 dark:text-slate-400">${s.id}</td>
+            <td class="p-4 font-bold text-slate-900 dark:text-white">${s.name}</td>
+            <td class="p-4 font-semibold text-slate-700 dark:text-slate-300">Kelas ${s.class}</td>
+            <td class="p-4">
+              ${s.is_lcd 
+                ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-pink-500/10 text-pink-500 border border-pink-500/30">⭐ LCD CORE TEAM</span>' 
+                : '<span class="text-slate-400 text-[11px]">—</span>'}
+            </td>
+            <td class="p-4 text-center font-bold ${vCount > 0 ? 'text-rose-500' : 'text-emerald-500'}">
+              ${vCount} Kasus
+            </td>
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button onclick="openEditStudentModal('${s.id}')" class="p-1.5 hover:bg-sky-500/10 text-slate-600 dark:text-slate-400 hover:text-sky-500 rounded-lg transition" title="Edit Data">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteStudentRecord('${s.id}')" class="p-1.5 hover:bg-rose-500/10 text-slate-600 dark:text-slate-400 hover:text-rose-500 rounded-lg transition" title="Hapus Data">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      safeCreateIcons();
+    }
+
+    function openAddStudentModal() {
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Tambah Santriwati / Rekrutan LCD Baru</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Masukkan identitas santriwati baru ke master database.</p>
+          </div>
+          <form onsubmit="handleSaveNewStudent(event)" class="space-y-3">
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Santriwati *</label>
+              <input type="text" id="modal-std-name" required placeholder="Contoh: Fatimah Az-Zahra" class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kelas *</label>
+                <input type="text" id="modal-std-class" required placeholder="Contoh: 8F atau 10C" class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status Tim LCD</label>
+                <select id="modal-std-lcd" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="0">Santriwati Reguler</option>
+                  <option value="1">Anggota Inti LCD</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Simpan Data</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function handleSaveNewStudent(e) {
+      e.preventDefault();
+      const newId = 'STR-' + String(DB.students.length + 1).padStart(3, '0');
+      DB.students.push({
+        id: newId,
+        name: document.getElementById('modal-std-name').value.trim(),
+        class: document.getElementById('modal-std-class').value.trim().toUpperCase(),
+        is_lcd: document.getElementById('modal-std-lcd').value === '1'
+      });
+      saveDB();
+      closeModal();
+      navigate('students');
+    }
+
+    function openEditStudentModal(id) {
+      const s = (DB.students || []).find(item => item.id === id);
+      if (!s) return;
+
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Edit Data Santriwati / LCD</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">ID: ${s.id}</p>
+          </div>
+          <form onsubmit="handleUpdateStudent(event, '${s.id}')" class="space-y-3">
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Santriwati *</label>
+              <input type="text" id="edit-std-name" value="${s.name}" required class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kelas *</label>
+                <input type="text" id="edit-std-class" value="${s.class}" required class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status Tim LCD</label>
+                <select id="edit-std-lcd" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                  <option value="0" ${!s.is_lcd ? 'selected' : ''}>Santriwati Reguler</option>
+                  <option value="1" ${s.is_lcd ? 'selected' : ''}>Anggota Inti LCD</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Perbarui</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function handleUpdateStudent(e, id) {
+      e.preventDefault();
+      const s = (DB.students || []).find(item => item.id === id);
+      if (!s) return;
+
+      s.name = document.getElementById('edit-std-name').value.trim();
+      s.class = document.getElementById('edit-std-class').value.trim().toUpperCase();
+      s.is_lcd = document.getElementById('edit-std-lcd').value === '1';
+
+      saveDB();
+      closeModal();
+      navigate('students');
+    }
+
+    function deleteStudentRecord(id) {
+      if (confirm('Yakin ingin menghapus santriwati ini dari database?')) {
+        DB.students = (DB.students || []).filter(s => s.id !== id);
+        saveDB();
+        navigate('students');
+      }
+    }
+
+    // ==========================================
+    // 7. REKAPITULASI & DUKUNGAN LPJ
+    // ==========================================
+    function renderReports(container) {
+      const allV = (DB.violations || []).filter(v => v.status !== 'DELETED');
+      const uniqueStudentIds = new Set(allV.map(v => v.student_id)).size;
+      const totalChecks = (DB.permissions || []).length + allV.length;
+
+      const catCounts = {};
+      DB.categories.forEach(c => { catCounts[c.category_name] = 0; });
+      allV.forEach(v => {
+        catCounts[v.category_name] = (catCounts[v.category_name] || 0) + 1;
+      });
+
+      const classCounts = {};
+      allV.forEach(v => {
+        classCounts[v.student_class] = (classCounts[v.student_class] || 0) + 1;
+      });
+
+      container.innerHTML = `
+        <div class="space-y-6 max-w-6xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Rekapitulasi & Dukungan LPJ</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Satu klik untuk rekap tahunan, bulanan, dan ekspor data bersih ke format CSV.</p>
+            </div>
+            <button onclick="exportToCsv()" class="py-2.5 px-5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs shadow-md flex items-center gap-2 transition">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Ekspor Data ke CSV</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="cli-card p-6 rounded-3xl border shadow-xs">
+              <span class="text-xs text-slate-700 dark:text-slate-300 font-extrabold uppercase tracking-wide block">TOTAL PELANGGARAN AKTIF</span>
+              <span class="text-4xl font-black text-slate-900 dark:text-white mt-2 block">${allV.length}</span>
+              <span class="text-[11px] text-slate-600 dark:text-slate-400 mt-1 block">Data kumulatif tahun berjalan</span>
+            </div>
+
+            <div class="cli-card p-6 rounded-3xl border shadow-xs">
+              <span class="text-xs text-slate-700 dark:text-slate-300 font-extrabold uppercase tracking-wide block">SANTRI DENGAN PELANGGARAN</span>
+              <span class="text-4xl font-black text-amber-500 mt-2 block">${uniqueStudentIds}</span>
+              <span class="text-[11px] text-slate-600 dark:text-slate-400 mt-1 block">Santri dengan riwayat record</span>
+            </div>
+
+            <div class="cli-card p-6 rounded-3xl border shadow-xs">
+              <span class="text-xs text-slate-700 dark:text-slate-300 font-extrabold uppercase tracking-wide block">TOTAL LOG PEMERIKSAAN</span>
+              <span class="text-4xl font-black text-sky-500 mt-2 block">${totalChecks}</span>
+              <span class="text-[11px] text-slate-600 dark:text-slate-400 mt-1 block">Total log sesi & perizinan</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div class="cli-card p-6 rounded-3xl border shadow-xs space-y-4">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Rekap Berdasarkan Kategori</h3>
+              <div class="space-y-4">
+                ${DB.categories.map(c => {
+                  const cnt = catCounts[c.category_name] || 0;
+                  const pct = allV.length > 0 ? Math.round((cnt / allV.length) * 100) : 0;
+                  return `
+                    <div class="space-y-1.5">
+                      <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+                        <span>${c.category_name}</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-semibold">${cnt} record (${pct}%)</span>
+                      </div>
+                      <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="bg-sky-500 h-2 rounded-full" style="width: ${pct}%"></div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <div class="cli-card p-6 rounded-3xl border shadow-xs space-y-4">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Rekap Berdasarkan Kelas</h3>
+              ${Object.keys(classCounts).length === 0 ? `
+                <div class="py-16 text-center text-slate-600 dark:text-slate-400 text-xs italic">
+                  Belum ada pelanggaran tercatat.
+                </div>
+              ` : `
+                <div class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1 font-medium">
+                  ${Object.entries(classCounts).map(([cls, cnt]) => `
+                    <div class="p-3 cli-inner rounded-xl border flex justify-between items-center text-xs">
+                      <span class="font-bold text-slate-900 dark:text-white">Kelas ${cls}</span>
+                      <span class="px-2.5 py-0.5 rounded-full font-extrabold text-[10px] bg-rose-500/10 text-rose-500 border border-rose-500/20">${cnt} Pelanggaran</span>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function exportToCsv() {
+      const allV = (DB.violations || []).filter(v => v.status !== 'DELETED');
+      if (allV.length === 0) {
+        alert("Belum ada data pelanggaran untuk diekspor!");
+        return;
+      }
+
+      let csv = "ID,Tanggal,Nama Santriwati,Kelas,Sesi,Pelanggaran,Tingkatan,Sanksi,Status,Petugas\n";
+      allV.forEach(v => {
+        csv += `"${v.violation_id}","${v.date}","${v.student_name}","${v.student_class}","${v.session}","${v.category_name}","${v.level}","${v.sanction}","${v.status}","${v.officer}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Rekap_LPJ_Bahasa_ZIIS_${getTodayString()}.csv`;
+      link.click();
+    }
+
+    // ==========================================
+    // 8. MIGRASI DATA / BACKUP JSON
+    // ==========================================
+    function renderBackup(container) {
+      const activeJson = JSON.stringify({
+        violations: DB.violations,
+        permissions: DB.permissions,
+        letters: DB.letters,
+        categories: DB.categories,
+        students: DB.students,
+        timestamp: new Date().toISOString()
+      }, null, 2);
+
+      container.innerHTML = `
+        <div class="space-y-6 max-w-4xl mx-auto">
+          <div class="cli-card rounded-3xl border shadow-xs p-6 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base font-extrabold text-slate-900 dark:text-white">📦 Export / Copy Data Lokal</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400">Salin kode JSON di bawah ini untuk disimpan atau dipindahkan ke device lain.</p>
+            
+            <textarea id="json-export-area" readonly class="w-full h-44 cli-inner border rounded-2xl p-3 font-mono text-[11px] focus:outline-none custom-scroll font-medium text-slate-900 dark:text-white">${activeJson}</textarea>
+            
+            <button onclick="copyJsonBackup()" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span>Copy Kode JSON</span>
+            </button>
+          </div>
+
+          <div class="cli-card rounded-3xl border shadow-xs p-6 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base font-extrabold text-slate-900 dark:text-white">📥 Import / Paste Data</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400">Paste kode JSON dari backup device lain ke kolom ini, lalu klik tombol **Import Data**.</p>
+            
+            <textarea id="json-import-area" placeholder="Paste kode JSON di sini..." class="w-full h-44 cli-inner border rounded-2xl p-3 font-mono text-[11px] focus:outline-none focus:border-sky-500 custom-scroll font-medium text-slate-900 dark:text-white"></textarea>
+            
+            <div class="flex items-center gap-3">
+              <button onclick="executeJsonImport('merge')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Import Data (Gabungkan)</span>
+              </button>
+              <button onclick="executeJsonImport('replace')" class="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-2 transition">
+                <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                <span>Timpa Semua Data Lama</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function copyJsonBackup() {
+      const area = document.getElementById('json-export-area');
+      if (!area) return;
+      area.select();
+      try {
+        await navigator.clipboard.writeText(area.value);
+        alert('Kode JSON berhasil disalin ke clipboard!');
+      } catch (e) {
+        alert('Gagal menyalin otomatis, silakan blok dan salin manual.');
+      }
+    }
+
+    function executeJsonImport(mode) {
+      const raw = document.getElementById('json-import-area')?.value.trim();
+      if (!raw) {
+        alert('Kolom JSON import masih kosong!');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (mode === 'replace') {
+          DB.violations = parsed.violations || [];
+          DB.permissions = parsed.permissions || [];
+          DB.letters = parsed.letters || [];
+          if (parsed.categories) DB.categories = parsed.categories;
+          if (parsed.students) DB.students = parsed.students;
+        } else {
+          DB.violations = [...DB.violations, ...(parsed.violations || [])];
+          DB.permissions = [...DB.permissions, ...(parsed.permissions || [])];
+          DB.letters = [...DB.letters, ...(parsed.letters || [])];
+          if (parsed.students) DB.students = [...DB.students, ...(parsed.students || [])];
+        }
+        saveDB();
+        alert('Data JSON berhasil di-import dan diperbarui!');
+        navigate('dashboard');
+      } catch (err) {
+        alert('Format kode JSON tidak valid! Pastikan format sesuai.');
+      }
+    }
+
+    // ==========================================
+    // 9. PENGATURAN KATEGORI & ATURAN CUSTOM
+    // ==========================================
+    function renderCategories(container) {
+      container.innerHTML = `
+        <div class="space-y-6 max-w-5xl mx-auto">
+          <div class="cli-card p-6 rounded-3xl border shadow-xs flex justify-between items-center">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">SOP & Kategori Pelanggaran Bahasa</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Atur bobot tingkatan (Ringan, Sedang, Berat) serta tambah jenis aturan baru secara fleksibel.</p>
+            </div>
+            <button onclick="openAddCategoryModal()" class="py-2.5 px-5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Tambah Aturan Baru</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${DB.categories.map(c => `
+              <div class="cli-card p-5 rounded-2xl border shadow-xs flex justify-between items-center">
+                <div>
+                  <span class="font-extrabold text-sm block text-slate-900 dark:text-white">${c.category_name}</span>
+                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full mt-1 inline-block ${                       c.default_level === 'BERAT' ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' :                       c.default_level === 'SEDANG' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :                       'bg-amber-500/10 text-amber-500 border border-amber-500/20'                      }">${c.default_level}</span>
+                </div>
+                <button onclick="deleteCategory('${c.category_id}')" class="p-1.5 hover:bg-rose-500/10 text-slate-600 dark:text-slate-400 hover:text-rose-500 rounded-lg transition" title="Hapus Aturan">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function openAddCategoryModal() {
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Tambah Jenis Pelanggaran Bahasa</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Tambahkan jenis pelanggaran baru ke dalam database SOP.</p>
+          </div>
+          <form onsubmit="handleSaveCategory(event)" class="space-y-3">
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Bentuk Pelanggaran *</label>
+              <input type="text" id="new-cat-name" required placeholder="Contoh: Menggunakan bahasa Indonesia saat briefing" class="w-full cli-inner border rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tingkatan Bobot *</label>
+              <select id="new-cat-level" class="w-full cli-inner border rounded-xl p-2.5 font-bold focus:outline-none focus:border-sky-500 text-slate-900 dark:text-white">
+                <option value="RINGAN">Ringan (Tulis 20-40 Mufrodat)</option>
+                <option value="SEDANG">Sedang (Tulis 50-60 Mufrodat / Uslub)</option>
+                <option value="BERAT">Berat (Papan Pelanggaran 3-5 Hari / Kerudung)</option>
+              </select>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+              <button type="submit" class="px-5 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Simpan</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function handleSaveCategory(e) {
+      e.preventDefault();
+      DB.categories.push({
+        category_id: 'CAT-' + Date.now(),
+        category_name: document.getElementById('new-cat-name').value.trim(),
+        default_level: document.getElementById('new-cat-level').value
+      });
+      saveDB();
+      closeModal();
+      navigate('categories');
+    }
+
+    function deleteCategory(id) {
+      if (confirm('Hapus kategori aturan ini?')) {
+        DB.categories = DB.categories.filter(c => c.category_id !== id);
+        saveDB();
+        navigate('categories');
+      }
+    }
+
+    function showModal(html) {
+      const container = document.getElementById('modal-container');
+      if (!container) return;
+      container.innerHTML = `
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div class="cli-card border shadow-2xl rounded-3xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-150">
+            ${html}
+          </div>
+        </div>
+      `;
+      safeCreateIcons();
+    }
+
+    function closeModal() {
+      const container = document.getElementById('modal-container');
+      if (container) container.innerHTML = '';
+    }
+
+    function openAiSettingsModal() {
+      showModal(`
+        <div class="p-6 space-y-4 text-xs">
+          <div class="border-b pb-3 border-slate-200 dark:border-slate-800">
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Pengaturan Groq API Key</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-[11px]">Dapatkan API key gratis di console.groq.com</p>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Groq API Key (gsk_...)</label>
+            <input type="password" id="groq-key-input" value="${DB.groqApiKey}" placeholder="gsk_..." class="w-full cli-inner border rounded-xl p-2.5 font-mono text-xs focus:outline-none focus:border-sky-500 font-medium text-slate-900 dark:text-white" />
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 cli-inner font-bold rounded-xl text-slate-700 dark:text-slate-300">Batal</button>
+            <button type="button" onclick="saveGroqKey()" class="px-4 py-2 bg-sky-500 text-white font-bold rounded-xl shadow-md">Simpan Key</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function saveGroqKey() {
+      const key = document.getElementById('groq-key-input')?.value.trim();
+      DB.groqApiKey = key;
+      Storage.set('GROQ_KEY', key);
+      closeModal();
+      alert('Groq API Key untuk CLI Assistant Kece berhasil disimpan!');
+    }
+
+    function handleGlobalHeaderSearch(q) {
+      const res = document.getElementById('header-search-results');
+      if (!res) return;
+      if (!q || q.length < 2) {
+        res.classList.add('hidden');
+        return;
+      }
+      const matches = (DB.students || []).filter(s => 
+        s.name.toLowerCase().includes(q.toLowerCase()) || 
+        s.class.toLowerCase().includes(q.toLowerCase()) ||
+        s.id.toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 6);
+
+      if (matches.length === 0) {
+        res.innerHTML = `<div class="p-3 text-xs text-slate-600 dark:text-slate-400 text-center font-medium">Tidak ditemukan.</div>`;
+      } else {
+        res.innerHTML = matches.map(s => `
+          <div onclick="navigate('students'); document.getElementById('header-search-results')?.classList.add('hidden');" class="p-2.5 hover:bg-sky-500/10 rounded-xl cursor-pointer flex justify-between items-center text-xs transition">
+            <div>
+              <span class="font-bold text-slate-900 dark:text-white">${s.name}</span>
+              ${s.is_lcd ? '<span class="ml-1 text-[9px] bg-pink-500/20 text-pink-500 px-1 py-0.5 rounded font-black">LCD</span>' : ''}
+              <div class="text-[10px] text-slate-600 dark:text-slate-400 font-medium">${s.id}</div>
+            </div>
+            <span class="px-2 py-0.5 bg-sky-500/20 text-sky-600 dark:text-sky-400 font-bold rounded-full text-[10px]">Kelas ${s.class}</span>
+          </div>
+        `).join('');
+      }
+      res.classList.remove('hidden');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.getElementById('global-search-header')?.focus();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      initTopBarOfficer();
+      navigate('dashboard');
+    });
+  </script>
+</body>
+</html>
