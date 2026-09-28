@@ -92,10 +92,6 @@
             <i data-lucide="user" class="w-4 h-4"></i>
           </div>
           <select id="global-officer-select" onchange="changeGlobalOfficer(this.value)" class="text-xs font-bold bg-transparent focus:outline-none cursor-pointer text-slate-900 dark:text-white">
-            <option value="Amirah Fauzi Badjamal">Amirah Fauzi Badjamal</option>
-            <option value="Fita Agesti Ramadhani">Fita Agesti Ramadhani</option>
-            <option value="Almira Anargya Arkan">Almira Anargya Arkan</option>
-            <option value="Amira Azalia">Amira Azalia</option>
           </select>
         </div>
       </div>
@@ -721,7 +717,7 @@ STR-495|Yumna Khaira|12G|0`;
       const sel = document.getElementById('global-officer-select');
       if (!sel) return;
       sel.innerHTML = CLI_OFFICERS.map(name => `
-        <option value="${name}" ${name === currentGlobalOfficer ? 'selected' : ''}>${name}</option>
+        <option value="${name}" class="bg-white dark:bg-[#0B132B] text-slate-900 dark:text-white" ${name === currentGlobalOfficer ? 'selected' : ''}>${name}</option>
       `).join('');
     }
 
@@ -1122,7 +1118,7 @@ STR-495|Yumna Khaira|12G|0`;
     }
 
     // ==========================================
-    // DYNAMIC GROQ AI ENGINE
+    // DYNAMIC GROQ AI ENGINE (FIXED MODEL TO llama3-8b-8192)
     // ==========================================
     async function handleSendDashboardAi(e) {
       e.preventDefault();
@@ -1170,7 +1166,7 @@ Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason 
             'Authorization': `Bearer ${activeKey}`
           },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'llama3-8b-8192',
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: text }
@@ -1190,9 +1186,10 @@ Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason 
             </div>
           `;
         } else {
+          const errData = await res.json().catch(() => ({}));
           container.innerHTML += `
             <div class="bg-rose-500/20 text-rose-500 p-2.5 rounded-2xl rounded-tl-xs border border-rose-500/30 text-xs font-semibold">
-              Gagal menghubungi Groq API. Pastikan API Key valid atau kuota mencukupi.
+              Gagal menghubungi Groq API: ${errData.error?.message || 'Pastikan API Key valid atau kuota mencukupi.'}
             </div>
           `;
         }
@@ -1982,7 +1979,7 @@ Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason 
           <td class="p-4 text-center text-slate-600 dark:text-slate-400 font-bold">${idx + 1}</td>
           <td class="p-4 text-slate-600 dark:text-slate-400 font-mono">${v.date}</td>
           <td class="p-4 font-bold text-slate-900 dark:text-white">${v.student_name}</td>
-          <td class="p-4 text-slate-700 dark:text-slate-300 font-semibold">${v.student_class}</td>
+          <td class="p-4 font-semibold text-slate-700 dark:text-slate-300">${v.student_class}</td>
           <td class="p-4">
             <span class="font-bold block text-slate-900 dark:text-white">${v.category_name}</span>
             <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${
