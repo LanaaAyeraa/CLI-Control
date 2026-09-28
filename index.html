@@ -21,7 +21,6 @@
       --bg-inner: #F1F5F9;
       --border-color: #CBD5E1;
       --text-main: #0F172A;
-      --text-muted: #334155;
     }
     html.theme-dark {
       --bg-main: #070D1E;
@@ -29,7 +28,6 @@
       --bg-inner: #090E1F;
       --border-color: #1E2C52;
       --text-main: #F1F5F9;
-      --text-muted: #94A3B8;
     }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -37,23 +35,34 @@
       color: var(--text-main);
       transition: background-color 0.2s ease, color 0.2s ease;
     }
-    /* Paksa warna teks agar mutlak hitam di mode terang dan putih di mode gelap */
-    .cli-card { 
-      background-color: var(--bg-card); 
-      border-color: var(--border-color); 
-      color: var(--text-main); 
-    }
-    .cli-inner { 
-      background-color: var(--bg-inner); 
-      border-color: var(--border-color); 
-      color: var(--text-main); 
-    }
-    html:not(.theme-dark) .cli-text-adaptive {
+    .cli-card { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
+    .cli-inner { background-color: var(--bg-inner); border-color: var(--border-color); color: var(--text-main); }
+    
+    html:not(.theme-dark) .cli-text-adaptive, 
+    html:not(.theme-dark) body, 
+    html:not(.theme-dark) td, 
+    html:not(.theme-dark) th, 
+    html:not(.theme-dark) span, 
+    html:not(.theme-dark) p, 
+    html:not(.theme-dark) label, 
+    html:not(.theme-dark) input, 
+    html:not(.theme-dark) select, 
+    html:not(.theme-dark) textarea {
       color: #0F172A !important;
     }
-    html.theme-dark .cli-text-adaptive {
+    html.theme-dark .cli-text-adaptive, 
+    html.theme-dark body, 
+    html.theme-dark td, 
+    html.theme-dark th, 
+    html.theme-dark span, 
+    html.theme-dark p, 
+    html.theme-dark label, 
+    html.theme-dark input, 
+    html.theme-dark select, 
+    html.theme-dark textarea {
       color: #F1F5F9 !important;
     }
+
     .hero-gradient {
       background: linear-gradient(135deg, #0284C7 0%, #2563EB 55%, #7C3AED 100%);
     }
@@ -73,12 +82,12 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-base font-extrabold tracking-tight cli-text-adaptive">CLI<span class="text-sky-500">CONTROL</span></span>
+            <span class="text-base font-extrabold tracking-tight">CLI<span class="text-sky-500">CONTROL</span></span>
             <span class="text-[9px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
             </span>
           </div>
-          <p class="text-[10px] text-slate-700 dark:text-slate-400 font-medium">Language Discipline & Permission Management • ZIIS Putri</p>
+          <p class="text-[10px] opacity-75 font-medium">Language Discipline & Permission Management • ZIIS Putri</p>
         </div>
       </div>
 
@@ -90,7 +99,7 @@
           id="global-search-header"
           oninput="handleGlobalHeaderSearch(this.value)"
           placeholder="Cari santriwati, anggota LCD, atau kelas..." 
-          class="w-full cli-inner text-xs rounded-xl pl-10 pr-16 py-2.5 border focus:border-sky-500 focus:outline-none transition font-semibold cli-text-adaptive"
+          class="w-full cli-inner text-xs rounded-xl pl-10 pr-16 py-2.5 border focus:border-sky-500 focus:outline-none transition font-semibold"
         />
         <span class="absolute right-3 text-[10px] cli-card border text-slate-400 px-1.5 py-0.5 rounded font-mono">Ctrl K</span>
         <div id="header-search-results" class="hidden absolute top-12 left-0 w-full cli-card rounded-2xl shadow-2xl border p-2 max-h-64 overflow-y-auto z-50"></div>
@@ -98,7 +107,7 @@
 
       <!-- Officer & Actions -->
       <div class="flex items-center gap-3 shrink-0">
-        <button onclick="toggleThemeMode()" class="w-9 h-9 rounded-xl cli-inner border cli-text-adaptive hover:text-amber-500 flex items-center justify-center transition" title="Ganti Mode Terang / Gelap">
+        <button onclick="toggleThemeMode()" class="w-9 h-9 rounded-xl cli-inner border hover:text-amber-500 flex items-center justify-center transition" title="Ganti Mode Terang / Gelap">
           <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
         </button>
 
@@ -106,7 +115,7 @@
           <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
             <i data-lucide="user" class="w-4 h-4"></i>
           </div>
-          <select id="global-officer-select" onchange="changeGlobalOfficer(this.value)" class="text-xs font-bold bg-transparent focus:outline-none cursor-pointer cli-text-adaptive">
+          <select id="global-officer-select" onchange="changeGlobalOfficer(this.value)" class="text-xs font-bold bg-transparent focus:outline-none cursor-pointer">
           </select>
         </div>
       </div>
@@ -116,14 +125,14 @@
     <div class="cli-card border-t px-4 lg:px-8">
       <div class="max-w-[1600px] mx-auto flex items-center gap-2 overflow-x-auto py-2 custom-scroll text-xs font-semibold">
         <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl text-sky-500 bg-sky-500/15 border border-sky-500/30 transition shrink-0"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard</span></button>
-        <button onclick="navigate('input-violation')" id="nav-input-violation" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="shield-alert" class="w-4 h-4 text-emerald-500"></i><span>Input Pelanggaran (Kasir)</span></button>
-        <button onclick="navigate('permissions')" id="nav-permissions" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="file-check-2" class="w-4 h-4 text-indigo-500"></i><span>Perizinan Bahasa</span></button>
-        <button onclick="navigate('collaboration')" id="nav-collaboration" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="mail" class="w-4 h-4 text-blue-500"></i><span>Surat & Kolaborasi</span></button>
-        <button onclick="navigate('violations')" id="nav-violations" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i><span>Data Pelanggaran & Sanksi</span></button>
-        <button onclick="navigate('students')" id="nav-students" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="users" class="w-4 h-4 text-cyan-500"></i><span>Data Santriwati & Tim LCD</span></button>
-        <button onclick="navigate('reports')" id="nav-reports" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i><span>Rekap & LPJ</span></button>
-        <button onclick="navigate('backup')" id="nav-backup" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="database" class="w-4 h-4 text-orange-500"></i><span>Migrasi Data</span></button>
-        <button onclick="navigate('categories')" id="nav-categories" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl cli-text-adaptive hover:text-sky-500 transition shrink-0"><i data-lucide="settings-2" class="w-4 h-4 text-slate-700 dark:text-slate-300"></i><span>SOP & Kategori Aturan</span></button>
+        <button onclick="navigate('input-violation')" id="nav-input-violation" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="shield-alert" class="w-4 h-4 text-emerald-500"></i><span>Input Pelanggaran (Kasir)</span></button>
+        <button onclick="navigate('permissions')" id="nav-permissions" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="file-check-2" class="w-4 h-4 text-indigo-500"></i><span>Perizinan Bahasa</span></button>
+        <button onclick="navigate('collaboration')" id="nav-collaboration" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="mail" class="w-4 h-4 text-blue-500"></i><span>Surat & Kolaborasi</span></button>
+        <button onclick="navigate('violations')" id="nav-violations" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i><span>Data Pelanggaran & Sanksi</span></button>
+        <button onclick="navigate('students')" id="nav-students" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="users" class="w-4 h-4 text-cyan-500"></i><span>Data Santriwati & Tim LCD</span></button>
+        <button onclick="navigate('reports')" id="nav-reports" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i><span>Rekap & LPJ</span></button>
+        <button onclick="navigate('backup')" id="nav-backup" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="database" class="w-4 h-4 text-orange-500"></i><span>Migrasi Data</span></button>
+        <button onclick="navigate('categories')" id="nav-categories" class="nav-pill flex items-center gap-2 px-4 py-2 rounded-xl hover:text-sky-500 transition shrink-0"><i data-lucide="settings-2" class="w-4 h-4"></i><span>SOP & Kategori Aturan</span></button>
       </div>
     </div>
   </header>
@@ -134,7 +143,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="cli-card border-t py-4 text-center text-xs cli-text-adaptive font-bold">
+  <footer class="cli-card border-t py-4 text-center text-xs font-bold opacity-75">
     <p>“Speaking Good Language, Building Bright Future.” • Bagian Bahasa (CLI) Pondok Pesantren Modern ZIIS Cilongok</p>
   </footer>
 
@@ -1123,7 +1132,7 @@ STR-495|Yumna Khaira|12G|0`;
                 placeholder="Ketik pesan / tanya data..." 
                 class="flex-1 cli-inner border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-semibold cli-text-adaptive"
               />
-              <button type="submit" class="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-xs transition shrink-0">
+              <button type="submit" class="p-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl shadow-xs transition shrink-0">
                 <i data-lucide="send" class="w-4 h-4"></i>
               </button>
             </form>
@@ -1133,7 +1142,7 @@ STR-495|Yumna Khaira|12G|0`;
     }
 
     // ==========================================
-    // DYNAMIC GROQ AI ENGINE
+    // DYNAMIC GROQ AI ENGINE: MODEL DISCOVERY
     // ==========================================
     async function handleSendDashboardAi(e) {
       e.preventDefault();
@@ -1166,14 +1175,35 @@ STR-495|Yumna Khaira|12G|0`;
       container.innerHTML += `<div id="ai-loading-dash" class="cli-text-adaptive opacity-75 italic text-[11px] font-semibold">CLI Assistant Kece sedang mengetik... ⚡</div>`;
       container.scrollTop = container.scrollHeight;
 
-      try {
-        const systemPrompt = `Kamu adalah CLI Assistant Kece: Asisten AI Cerdas, Ramah, Sopan & Energik untuk Bagian Bahasa (CLI) Pondok Pesantren Modern ZIIS Putri Cilongok.
+      const systemPrompt = `Kamu adalah CLI Assistant Kece: Asisten AI Cerdas, Ramah, Sopan & Energik untuk Bagian Bahasa (CLI) Pondok Pesantren Modern ZIIS Putri Cilongok.
 Petugas aktif saat ini: ${currentGlobalOfficer}.
 Total data santriwati: ${DB.students.length}.
 Program bahasa: Ilqo Mufrodat (harian Ahad-Jumat), Muhadatsah (Sabtu), Language Event (Ahad).
 SOP Pelanggaran: Ringan (Aku-Kamu, Telat), Sedang (Bahasa Daerah Jawa/Sunda, Alpa 1-2x), Berat (Bahasa Kasar/Kotor, Alpa >=3x). Sanksi bertingkat mulai dari menulis mufrodat, daily conversation, uslub, papan bahasa, hingga kerudung pelanggaran.
 Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason (Alasan). Jawablah dengan lugas, ramah, dan solutif.`;
 
+      let workingModel = 'llama-3.3-70b-versatile';
+      try {
+        const mResp = await fetch('https://api.groq.com/openai/v1/models', {
+          headers: { 'Authorization': `Bearer ${activeKey}` }
+        });
+        if (mResp.ok) {
+          const mData = await mResp.json();
+          const validChatModels = (mData.data || [])
+            .map(m => m.id)
+            .filter(id => !id.includes('whisper') && !id.includes('guard') && !id.includes('vision') && !id.includes('embed'));
+          
+          const chosen = validChatModels.find(id => id.includes('70b-versatile')) ||
+                         validChatModels.find(id => id.includes('8b-instant')) ||
+                         validChatModels.find(id => id.includes('llama-3.3')) ||
+                         validChatModels[0];
+          if (chosen) workingModel = chosen;
+        }
+      } catch (err) {
+        workingModel = 'llama-3.3-70b-versatile';
+      }
+
+      try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -1181,7 +1211,7 @@ Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason 
             'Authorization': `Bearer ${activeKey}`
           },
           body: JSON.stringify({
-          const GROQ_MODEL = "llama-3.1-8b-instant"; 
+            model: workingModel,
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: text }
