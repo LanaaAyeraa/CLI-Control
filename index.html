@@ -1181,7 +1181,7 @@ Format perizinan dari Mba Fita: Tanggal, Nama, Kelas, Agenda Bahasa, dan Reason 
             'Authorization': `Bearer ${activeKey}`
           },
           body: JSON.stringify({
-            model: 'llama3-8b-8192',
+          const GROQ_MODEL = "llama-3.1-8b-instant"; 
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: text }
